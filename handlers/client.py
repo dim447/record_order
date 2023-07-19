@@ -1,4 +1,4 @@
-from date_base.sqlite_db import sql_add_client
+from data_base.sqlite_db import sql_add_client
 
 hi_text = '''
 Добрый день!\nВот не ожидал тебя тут увидеть, бро \U0001F91D \n
