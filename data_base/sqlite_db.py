@@ -1,11 +1,12 @@
 import sqlite3 as sq
 # from create_bot import bot, dp
 
+base_connect = sq.connect('data_base/clients.db')
+cur = base_connect.cursor()
+name_clients = []
+
 
 def sql_start():
-    global base_connect, cur
-    base_connect = sq.connect('data_base/clients.db')
-    cur = base_connect.cursor()
     if base_connect:
         print('Data base connected Ok!')
     base_connect.execute(
@@ -17,7 +18,8 @@ def sql_start():
 def sql_add_client(data):
     cur.execute('INSERT INTO clients (name, surname, age, phone_number, e_mail) VALUES (?,?,?,?,?)', tuple(data))
     base_connect.commit()
-    base_connect.close()
+    # base_connect.close()
+    print('Клиент добавлен...')
 
 
 def add_client_description(data, name):
@@ -27,16 +29,17 @@ def add_client_description(data, name):
     base_connect.close()
 
 
+
 def sql_read_client():
     # ret = cur.execute('SELECT * FROM clients ORDER BY RANDOM() LIMIT 1').fetchone()
     ret = cur.execute('SELECT * FROM clients').fetchall()
     # # ret = cur.execute('SELECT * FROM table ORDER BY RANDOM() LIMIT 1')
     for _ in ret:
         print(_)
+        name_clients.append(_[1])
+    return name_clients
 
 
 async def sql_delete_client(data):
-    cur.execute('DELETE FROM clients WHERE client_name == ?', (data,))
+    cur.execute('DELETE FROM clients WHERE name == ?', (data,))
     base_connect.commit()
-
-

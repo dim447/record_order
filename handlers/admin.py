@@ -1,12 +1,17 @@
 ''' Добавить описание клиента '''
-from data_base.sqlite_db import add_client_description, sql_start
+from data_base import sqlite_db
+from data_base.sqlite_db import name_clients
 
 
 def add_description():
     name = input("Введите имя клиента ")
-    desc_client = input('Введите комментарии для клиента ')
-    # sql_start()
-    add_client_description(desc_client, name)
+    sqlite_db.sql_read_client()
+    if name in name_clients:
+        desc_client = input('Введите комментарии для клиента ')
+        sqlite_db.add_client_description(desc_client, name)
+    else:
+        print(f'Такого имени клиента нет в базе!')
+        add_description()
 
 
 # add_description()

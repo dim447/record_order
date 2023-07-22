@@ -1,25 +1,32 @@
-from data_base.sqlite_db import sql_add_client, sql_read_client
+from data_base import sqlite_db
+from handlers.admin import add_description
 
 hi_text = '''
-Добрый день!\nВот не ожидал тебя тут увидеть, бро \U0001F91D \n
-Начнём: выбери -->
-Итак, вот что я умею:\n<-- ------------------------ -->
-- Записаться на консультацию  --> 1
-- Добавить свои данные --> 2
-- Посмотреть клиентов -- > 3
-'''
-data = []
+Добрый день!\nВот не ожидал тебя тут увидеть, бро \U0001F91D \n'''
 
 
 def hi_client():
     print(hi_text)
-    action_client = input(f'Что вы хотите: 1 / 2 / 3 ')
-    if action_client == "1" or action_client == 1:
-        record_consalt()
-    elif action_client == "3" or action_client == 3:
-        sql_read_client()
-    else:
-        input_data()
+    action_client_1()
+
+
+def action_client_1():
+    action_client = input(f'''<-- ------------------------ --> 
+    - Записаться на консультацию    --> 1
+    - Добавить свои данные          --> 2
+    - Посмотреть клиентов           --> 3 
+Начнём: выбери  -- ''')
+    match action_client:
+        case 1 | '1':
+            record_consalt()
+        case 2 | '2':
+            input_data()
+            action_client_1()
+        case 3 | '3':
+            sqlite_db.sql_read_client()
+            action_client_1()
+        case 'admin':
+            add_description()
 
 
 def input_data():
@@ -28,12 +35,9 @@ def input_data():
     age = input(f'Введите возраст ')
     phone_number = input(f'Введите телефон ')
     email = input(f'Введите e-mail ')
-    data = [name, surname, age, phone_number, email]
-    sql_add_client(data)
-    print(tuple(data))
+    data_of_client = [name, surname, age, phone_number, email]
+    sqlite_db.sql_add_client(data_of_client)
 
 
 def record_consalt():
     print('Выбери дату')
-
-
