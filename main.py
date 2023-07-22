@@ -1,6 +1,5 @@
 import logging
 from data_base import sqlite_db
-# from handlers.admin import add_description
 from handlers.client import hi_client
 
 

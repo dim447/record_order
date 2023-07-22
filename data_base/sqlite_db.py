@@ -29,7 +29,6 @@ def add_client_description(data, name):
     base_connect.close()
 
 
-
 def sql_read_client():
     # ret = cur.execute('SELECT * FROM clients ORDER BY RANDOM() LIMIT 1').fetchone()
     ret = cur.execute('SELECT * FROM clients').fetchall()
