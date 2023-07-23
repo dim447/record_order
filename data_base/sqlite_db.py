@@ -10,8 +10,24 @@ def sql_start():
     if base_connect:
         print('Data base connected Ok!')
     base_connect.execute(
-        'CREATE TABLE IF NOT EXISTS clients (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, '
-        'surname TEXT NOT NULL, age INTEGER, phone_number TEXT NOT NULL, e_mail TEXT, description TEXT)')
+        'CREATE TABLE IF NOT EXISTS clients '
+        '(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, '
+        'name TEXT NOT NULL, '
+        'surname TEXT NOT NULL, '
+        'age INTEGER, '
+        'phone_number TEXT NOT NULL, '
+        'e_mail TEXT, '
+        'description TEXT)')
+    base_connect.execute('''
+           CREATE TABLE IF NOT EXISTS shedule (
+               date TEXT PRIMARY KEY,
+               "10-11" TEXT,
+               "11-12" TEXT,
+               "13-14" TEXT,
+               "14-15" TEXT,
+               "15-16" TEXT
+           )
+       ''')
     base_connect.commit()
 
 
@@ -42,3 +58,35 @@ def sql_read_client():
 async def sql_delete_client(data):
     cur.execute('DELETE FROM clients WHERE name == ?', (data,))
     base_connect.commit()
+
+
+def add_client_order(date, time, name):
+    cur.execute('INSERT INTO shedule (date) VALUES (?)', [date])
+    match time:
+        case '10-11':
+            cur.execute('UPDATE shedule SET "10-11" = ? WHERE date = ?', (name, date))
+        case '11-12':
+            cur.execute('UPDATE shedule SET "11-12" = ? WHERE date = ?', (name, date))
+        case '13-14':
+            cur.execute('UPDATE shedule SET "13-14" = ? WHERE date = ?', (name, date))
+        case '14-15':
+            cur.execute('UPDATE shedule SET "14-15" = ? WHERE date = ?', (name, date))
+        case '15-16':
+            cur.execute('UPDATE shedule SET "15-16" = ? WHERE date = ?', (name, date))
+    # cur.execute('INSERT INTO shedule date VALUES ?', (date))
+    # cur.execute('UPDATE shedule SET description = ? WHERE name = ?', (data, name))
+    base_connect.commit()
+    base_connect.close()
+
+
+def sql_read_free_time(date):
+    # ret = cur.execute('SELECT * FROM clients ORDER BY RANDOM() LIMIT 1').fetchone()
+    ret = cur.execute('SELECT * FROM shedule WHERE date = ?', (date,)).fetchall()
+    # # ret = cur.execute('SELECT * FROM table ORDER BY RANDOM() LIMIT 1')
+    print(f'  "Дата",    "10-11" "11-12" "13-14" "14-15" "15-16"')
+
+    print(ret)
+    # for _ in ret:
+    #     print(_)
+    #
+    # return name_clients

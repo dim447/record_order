@@ -1,4 +1,5 @@
 from data_base import sqlite_db
+from data_base.sqlite_db import add_client_order, sql_read_free_time
 from handlers.admin import add_description
 import calendar
 import datetime
@@ -49,6 +50,9 @@ def record_consult():
     # datetime.date.fromisoformat('2020-10-09')
     year = now.year
     month = now.month
-    print('Выбери дату')
-    print(f"Calendar of {month} {year} is:")
+    # print(f"Calendar of {month} {year} is:")
     print(calendar.month(year, month, 2, 1))
+    date_order = input('\nВведи дату -- > ')
+    sql_read_free_time(date_order)
+    # add_client_order(date_order, '11-12', "Дим")
+
