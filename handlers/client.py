@@ -1,5 +1,8 @@
 from data_base import sqlite_db
 from handlers.admin import add_description
+import calendar
+import datetime
+
 
 hi_text = '''
 Добрый день!\nВот не ожидал тебя тут увидеть, бро \U0001F91D \n'''
@@ -18,7 +21,7 @@ def action_client_1():
 Начнём: выбери  -- ''')
     match action_client:
         case 1 | '1':
-            record_consalt()
+            record_consult()
         case 2 | '2':
             input_data()
             action_client_1()
@@ -39,5 +42,13 @@ def input_data():
     sqlite_db.sql_add_client(data_of_client)
 
 
-def record_consalt():
+def record_consult():
+    now = datetime.datetime.now()
+    current_date = datetime.date.today()
+    print(f' Сегодня: {current_date}')
+    # datetime.date.fromisoformat('2020-10-09')
+    year = now.year
+    month = now.month
     print('Выбери дату')
+    print(f"Calendar of {month} {year} is:")
+    print(calendar.month(year, month, 2, 1))
