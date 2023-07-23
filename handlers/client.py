@@ -1,6 +1,6 @@
 from data_base import sqlite_db
 from data_base.sqlite_db import add_client_order, sql_read_free_time
-from handlers.admin import add_description
+from handlers.admin import admin_menu
 import calendar
 import datetime
 
@@ -18,7 +18,6 @@ def action_client_1():
     action_client = input(f'''<-- ------------------------ --> 
     - Записаться на консультацию    --> 1
     - Добавить свои данные          --> 2
-    - Посмотреть клиентов           --> 3 
 Начнём: выбери  -- ''')
     match action_client:
         case 1 | '1':
@@ -26,11 +25,8 @@ def action_client_1():
         case 2 | '2':
             input_data()
             action_client_1()
-        case 3 | '3':
-            sqlite_db.sql_read_client()
-            action_client_1()
         case 'admin':
-            add_description()
+            admin_menu()
 
 
 def input_data():
@@ -53,6 +49,6 @@ def record_consult():
     # print(f"Calendar of {month} {year} is:")
     print(calendar.month(year, month, 2, 1))
     date_order = input('\nВведи дату -- > ')
-    sql_read_free_time(date_order)
-    # add_client_order(date_order, '11-12', "Дим")
+    # sql_read_free_time(date_order)
+    add_client_order(date_order, '11-12', "Дим")
 
