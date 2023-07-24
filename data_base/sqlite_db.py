@@ -14,7 +14,8 @@ def sql_start():
         '(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, '
         'name TEXT NOT NULL, '
         'surname TEXT NOT NULL, '
-        'age INTEGER, '
+        'surname TEXT NOT NULL, '
+        'age INTEGER NOT NULL, '
         'phone_number TEXT NOT NULL, '
         'e_mail TEXT, '
         'description TEXT)')
@@ -93,7 +94,7 @@ def sql_read_free_time(date):
 def check_record_exists(key_value):
     """
     Проверяет наличие записи в таблице по ключевому полю и его значению.
-    :param key_value: Значение ключевого поля для поиска --  дата.
+    :param key_value: Значение ключевого поля для поиска -- дата.
     :return: True, если запись с заданным ключевым значением существует, иначе False.
     """
     query = f"SELECT COUNT(*) FROM shedule WHERE date = ?;"
