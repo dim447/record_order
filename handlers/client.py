@@ -49,6 +49,20 @@ def record_consult():
     # print(f"Calendar of {month} {year} is:")
     print(calendar.month(year, month, 2, 1))
     date_order = input('\nВведи дату -- > ')
-    # sql_read_free_time(date_order)
-    add_client_order(date_order, '11-12', "Дим")
+    print(f'Свободные часы для консультации на дату: {date_order}')
+    sql_read_free_time(date_order)
+    time_order = input('\nВведи время  -- > ')
+    match time_order:
+        case '10' | '11':
+            time_order = '10-11'
+        case '11' | '12':
+            time_order = '11-12'
+        case '13' | '14':
+            time_order = '13-14'
+        case '14' | '15':
+            time_order = '14-15'
+        case '15' | '16':
+            time_order = '15-16'
+    print(time_order)
+    add_client_order(date_order, time_order, "Дим")
 

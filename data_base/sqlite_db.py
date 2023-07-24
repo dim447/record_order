@@ -39,14 +39,12 @@ def sql_add_client(data):
 
 
 def add_client_description(data, name):
-    # execute("UPDATE CATEGORY SET NAME=? WHERE ID=?", (name, category_id))
     cur.execute('UPDATE clients SET description = ? WHERE name = ?', (data, name))
     base_connect.commit()
     base_connect.close()
 
 
 def sql_read_client():
-    # ret = cur.execute('SELECT * FROM clients ORDER BY RANDOM() LIMIT 1').fetchone()
     ret = cur.execute('SELECT * FROM clients').fetchall()
     # # ret = cur.execute('SELECT * FROM table ORDER BY RANDOM() LIMIT 1')
     for _ in ret:
@@ -61,7 +59,11 @@ async def sql_delete_client(name):
 
 
 def add_client_order(date, time, name):
-    cur.execute('INSERT INTO shedule (date) VALUES (?)', [date])
+    record_exists = check_record_exists(date)
+    if record_exists:
+        pass
+    else:
+        cur.execute('INSERT INTO shedule (date) VALUES (?)', [date])
     match time:
         case '10-11':
             cur.execute('UPDATE shedule SET "10-11" = ? WHERE date = ?', (name, date))
@@ -78,10 +80,25 @@ def add_client_order(date, time, name):
 
 
 def sql_read_free_time(date):
-    ret = cur.execute('SELECT * FROM shedule WHERE date = ?', (date,)).fetchone()
-    column_names = [i[0] for i in cur.description]
-    # for i in range(len(column_names)):
-    print(f'Часы', column_names[1:])
-    # for i in ret[1:]:
-    #     print(i, end='  ')
-    print(f'       ', ret[1:])
+    record_exists = check_record_exists(date)
+    if record_exists:
+        ret = cur.execute('SELECT * FROM shedule WHERE date = ?', (date,)).fetchone()
+        column_names = [i[0] for i in cur.description]
+        print(f'Часы', *column_names[1:], sep="  ")
+        print(f'    ', *ret[1:], sep="   ")
+    else:
+        print(f"Запись на дату {date} не найдена.")
+
+
+def check_record_exists(key_value):
+    """
+    Проверяет наличие записи в таблице по ключевому полю и его значению.
+    :param key_value: Значение ключевого поля для поиска --  дата.
+    :return: True, если запись с заданным ключевым значением существует, иначе False.
+    """
+    query = f"SELECT COUNT(*) FROM shedule WHERE date = ?;"
+    cur.execute(query, (key_value,))
+    count = cur.fetchone()[0]
+    # cur.close()
+
+    return count > 0
