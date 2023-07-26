@@ -51,8 +51,8 @@ def record_consult():
     month = now.month
     # print(f"Calendar of {month} {year} is:")
     print(calendar.month(year, month, 2, 1))
-    date_order = input('\nВведи дату (ГГГГ-ММ-ДД) -- > ')
-    check_data_format(date_order) # Проверка формата даты
+    check_data_format() # Проверка формата даты
+    time_consult(date_order)
 
 
 def time_consult(date_order):
@@ -76,10 +76,13 @@ def time_consult(date_order):
     print(f'Вы записались на {date_order} на {time_order}')
 
 
-def check_data_format(date_order):
+def check_data_format():
+    global date_order
     try:
+        date_order = input('\nВведи дату (ГГГГ-ММ-ДД) -- > ')
         datetime.date.fromisoformat(date_order)
-        time_consult(date_order)
+        return date_order
+        # time_consult(date_order)
     except ValueError:
         print(f'Вы ввели не правильную дату, попробуйте еще раз! \n')
         check_data_format()

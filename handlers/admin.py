@@ -1,7 +1,7 @@
 ''' Админская часть '''
 from data_base import sqlite_db
 from data_base.sqlite_db import name_clients, sql_read_free_time, sql_read_client, add_client_description
-from handlers.client import check_data_format
+
 
 
 ################# Проверка пароля ##############
@@ -62,8 +62,8 @@ def add_description():
 
 # Посмотреть свободное время на дату
 def view_free_time():
-    date_order = input('\nВведи дату (ГГГГ-ММ-ДД) -- > ')
-    check_data_format(date_order)
+    from handlers.client import check_data_format
+    # date_order = input('\nВведи дату (ГГГГ-ММ-ДД) -- > ')
+    check_data_format()
     sql_read_free_time(date_order)
 
-# add_description()
