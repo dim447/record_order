@@ -64,6 +64,6 @@ def add_description():
 def view_free_time():
     from handlers.client import check_data_format
     # date_order = input('\nВведи дату (ГГГГ-ММ-ДД) -- > ')
-    check_data_format()
+    date_order = check_data_format()
     sql_read_free_time(date_order)
 

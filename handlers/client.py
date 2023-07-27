@@ -1,16 +1,14 @@
 from data_base import sqlite_db
-from data_base.sqlite_db import add_client_order, sql_read_free_time
+from data_base.sqlite_db import add_client_order, sql_read_free_time, check_phone_number
 from handlers.admin import admin_menu
 import calendar
 import datetime
-
 
 hi_text = '''
 Добрый день!
 Это программа записи на консультацию к психологу.
 Чтобы записаться на приём добавьте ваши данные.
 '''
-
 
 
 def hi_client():
@@ -25,8 +23,15 @@ def action_client_1():
 Начнём: выбери  -- Y/N ''')
     match action_client:
         case 'Y' | 'y':
-            name = input(f'Введите своё имя --> ')
-            record_consult()
+            phone_number = input(f'Введите свой номер телефона --> ')
+            name = check_phone_number(phone_number)
+            if name:
+                print(f"Добро пожаловать {name}! Можете записаться на консультацию.")
+                record_consult()
+            else:
+                print(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
+                input_data()
+                record_consult()
         case 'N' | 'n':
             input_data()
             record_consult()
@@ -51,7 +56,7 @@ def record_consult():
     month = now.month
     # print(f"Calendar of {month} {year} is:")
     print(calendar.month(year, month, 2, 1))
-    check_data_format() # Проверка формата даты
+    check_data_format()  # Проверка формата даты
     time_consult(date_order)
 
 
@@ -86,3 +91,7 @@ def check_data_format():
     except ValueError:
         print(f'Вы ввели не правильную дату, попробуйте еще раз! \n')
         check_data_format()
+
+
+
+

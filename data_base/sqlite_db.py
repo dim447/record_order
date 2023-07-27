@@ -86,7 +86,7 @@ def sql_read_free_time(date):
         ret = cur.execute('SELECT * FROM shedule WHERE date = ?', (date,)).fetchone()
         column_names = [i[0] for i in cur.description]
         print(f'Часы', *column_names[1:], sep="  ")
-        print(f'    ', *ret[1:], sep="   ")
+        print(f'   ', *ret[1:], sep="    ")
     else:
         print(f"Запись на дату {date} не найдена.")
 
@@ -103,3 +103,13 @@ def check_record_exists(key_value):
     # cur.close()
 
     return count > 0
+
+
+def check_phone_number(phone_number):
+    # Выполняем запрос для проверки наличия записи с указанным телефонным номером
+    cur.execute('SELECT * FROM clients WHERE phone_number = ?', (phone_number,))
+    row = cur.fetchone()
+    # Закрываем соединение
+    # base_connect.close()
+    # Если запрос вернул запись, значит телефонный номер найден в базе данных
+    return row[1] if row else None
