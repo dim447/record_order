@@ -40,12 +40,22 @@ def sql_add_client(data):
 
 
 def add_client_description(data, name):
+    '''
+    Добавление комментария о клиенте
+    :param data: сам комментарий
+    :param name: имя клиента
+    :return:
+    '''
     cur.execute('UPDATE clients SET description = ? WHERE name = ?', (data, name))
     base_connect.commit()
     base_connect.close()
 
 
 def sql_read_client():
+    '''
+    Чтение данных о всех клиентах в базе.
+    :return: список всех клиентов
+    '''
     ret = cur.execute('SELECT * FROM clients').fetchall()
     # # ret = cur.execute('SELECT * FROM table ORDER BY RANDOM() LIMIT 1')
     for _ in ret:
@@ -55,11 +65,23 @@ def sql_read_client():
 
 
 async def sql_delete_client(name):
+    '''
+    Удаление клиента.
+    :param name: имя клиента, надо подумать, имена могут быть разные
+    :return:
+    '''
     cur.execute('DELETE FROM clients WHERE name == ?', (name,))
     base_connect.commit()
 
 
 def add_client_order(date, time, name):
+    '''
+    Функция добавления записи на консультацию. Проверяет если даты нет, то добавляет строчку с датой.
+    :param date:  дата
+    :param time:  время в интервале
+    :param name: имя клиента
+    :return:
+    '''
     record_exists = check_record_exists(date)
     if record_exists:
         pass
@@ -81,6 +103,10 @@ def add_client_order(date, time, name):
 
 
 def sql_read_free_time(date):
+    '''
+    Проверяет по дате есть ли записи на эту дату.
+    Выводит в виде таблицы часы записи и имена клиентов
+    '''
     record_exists = check_record_exists(date)
     if record_exists:
         ret = cur.execute('SELECT * FROM shedule WHERE date = ?', (date,)).fetchone()
@@ -106,6 +132,11 @@ def check_record_exists(key_value):
 
 
 def check_phone_number(phone_number):
+    '''
+    Проверка по уникальному номеру телефона
+    :param phone_number: номер телефона
+    :return:
+    '''
     # Выполняем запрос для проверки наличия записи с указанным телефонным номером
     cur.execute('SELECT * FROM clients WHERE phone_number = ?', (phone_number,))
     row = cur.fetchone()

@@ -17,6 +17,11 @@ def hi_client():
 
 
 def action_client_1():
+    '''
+    меню выбора у клиента, если он уже зарегистрирован, то может записаться на консультацию,
+    если нет, то регистрирует свои данные
+    :return:
+    '''
     global name
     action_client = input(f'''<-- ------------------------ --> 
     - Вы уже зарегистрированы?
@@ -40,6 +45,10 @@ def action_client_1():
 
 
 def input_data():
+    '''
+    Ввод данных клиента
+    :return: имя клиента
+    '''
     name = input(f'Введите имя ')
     surname = input(f'Введите фамилию ')
     age = input(f'Введите возраст ')
@@ -61,6 +70,11 @@ def record_consult():
 
 
 def time_consult(date_order):
+    '''
+    Проверка на свободные часы на дату. Если да, то можно записаться
+    :param date_order: дата записи
+    :return:
+    '''
     print(f'Свободные часы для консультации на дату: {date_order}')
     sql_read_free_time(date_order)
     time_order = input('\nВведи время  -- > ')
@@ -82,6 +96,10 @@ def time_consult(date_order):
 
 
 def check_data_format():
+    '''
+    Проверка формата даты.
+    :return: дату
+    '''
     global date_order
     try:
         date_order = input('\nВведи дату (ГГГГ-ММ-ДД) -- > ')
