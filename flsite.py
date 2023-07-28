@@ -5,7 +5,7 @@ from data_base.sqlite_db import sql_add_client, sql_start
 app = Flask(__name__)
 
 # Временное хранилище данных клиентов (обычно заменяется базой данных)
-clients = []
+clients = ()
 
 
 @app.route('/')
@@ -13,7 +13,12 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/reg', methods=['GET', 'POST'])
+@app.route('/hi_page')
+def hi():
+    return render_template('hi_page.html')
+
+
+@app.route('/reg.html', methods=['GET', 'POST'])
 def registration():
     if request.method == 'POST':
         # Получаем данные из формы
