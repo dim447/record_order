@@ -26,22 +26,26 @@ def action_client_1():
     action_client = input(f'''<-- ------------------------ --> 
     - Вы уже зарегистрированы?
 Начнём: выбери  -- Y/N ''')
-    match action_client:
-        case 'Y' | 'y':
-            phone_number = input(f'Введите свой номер телефона --> ')
-            name = check_phone_number(phone_number)
-            if name:
-                print(f"Добро пожаловать {name}! Можете записаться на консультацию.")
-                record_consult()
-            else:
-                print(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
+    if action_client in ('Y', 'y', 'n', 'N', 'admin'):
+        match action_client:
+            case 'Y' | 'y':
+                phone_number = input(f'Введите свой номер телефона --> ')
+                name = check_phone_number(phone_number)
+                if name:
+                    print(f"Добро пожаловать {name}! Можете записаться на консультацию.")
+                    record_consult()
+                else:
+                    print(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
+                    input_data()
+                    record_consult()
+            case 'N' | 'n':
                 input_data()
                 record_consult()
-        case 'N' | 'n':
-            input_data()
-            record_consult()
-        case 'admin':
-            admin_menu()
+            case 'admin':
+                admin_menu()
+    else:
+        print(f"Вы ввели неправильно: нужно 'Y' или 'N'")
+        action_client_1()
 
 
 def input_data():
