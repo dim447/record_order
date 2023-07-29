@@ -1,6 +1,6 @@
 import sqlite3 as sq
 from flask import Flask, render_template, request
-from data_base.sqlite_db import sql_add_client, sql_start
+from data_base.sqlite_db import sql_add_client, sql_start, base_init
 
 app = Flask(__name__)
 
@@ -30,10 +30,12 @@ def registration():
 
         # Добавляем клиента в базу данных
         clients = (name, surname, int(age), phone, email,)
-        base_connect = sq.connect('data_base/clients.db')
-        cur = base_connect.cursor()
-        cur.execute('INSERT INTO clients (name, surname, age, phone_number, e_mail) VALUES (?,?,?,?,?)', tuple(clients))
-        base_connect.commit()
+        base_connect = base_init()
+        # base_connect = sq.connect('data_base/clients.db')
+        # cur = base_connect.cursor()
+        sql_add_client(clients)
+        # cur.execute('INSERT INTO clients (name, surname, age, phone_number, e_mail) VALUES (?,?,?,?,?)', tuple(clients))
+        # base_connect.commit()
         base_connect.close()
         # Отправляем клиенту сообщение об успешной регистрации (можно также перенаправить на другую страницу)
         return f"Спасибо за регистрацию, {name}!"

@@ -1,14 +1,18 @@
 import sqlite3 as sq
 # from create_bot import bot, dp
 
-base_connect = sq.connect('data_base/clients.db')
-cur = base_connect.cursor()
 name_clients = []
 
 
+def base_init():
+    global base_connect, cur
+    base_connect = sq.connect('data_base/clients.db')
+    cur = base_connect.cursor()
+    return base_connect, cur
+
+
 def sql_start():
-    if base_connect:
-        print('Data base connected Ok!')
+    base_init()
     base_connect.execute(
         'CREATE TABLE IF NOT EXISTS clients '
         '(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, '
