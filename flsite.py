@@ -13,9 +13,9 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/hi_page')
-def hi():
-    return render_template('hi_page.html')
+# @app.route('/hi_page')
+# def hi():
+#     return render_template('index.html')
 
 
 @app.route('/reg.html', methods=['GET', 'POST'])
@@ -31,11 +31,7 @@ def registration():
         # Добавляем клиента в базу данных
         clients = (name, surname, int(age), phone, email,)
         base_connect = base_init()
-        # base_connect = sq.connect('data_base/clients.db')
-        # cur = base_connect.cursor()
         sql_add_client(clients)
-        # cur.execute('INSERT INTO clients (name, surname, age, phone_number, e_mail) VALUES (?,?,?,?,?)', tuple(clients))
-        # base_connect.commit()
         base_connect.close()
         # Отправляем клиенту сообщение об успешной регистрации (можно также перенаправить на другую страницу)
         return f"Спасибо за регистрацию, {name}!"
