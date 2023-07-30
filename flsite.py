@@ -3,6 +3,7 @@ import time
 
 from flask import Flask, render_template, request, flash
 from data_base.sqlite_db import sql_add_client, base_init, check_phone_number
+from handlers.client import time_consult
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'sdjlkwkwjer435kjhj234gv2349fdjh38'
@@ -14,6 +15,19 @@ clients = ()
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/order.html', methods=['GET', 'POST'])
+def order():
+    if request.method == 'POST':
+        # Получаем данные из формы
+        date_order = request.form['order_day']
+        base_connect = base_init()
+        time_consult(date_order)
+        if date_order:
+            flash(f"Вы выбрали {date_order}! Выберите время.")
+        base_connect.close()
+    return render_template('order.html')
 
 
 @app.route('/input.html', methods=['GET', 'POST'])

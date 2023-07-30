@@ -10,7 +10,7 @@
     <h1>Вход для записи на консультацию.</h1>
     <div>Введите имя и телефон (без 8), указанные при регистрации</div>
     {% for msg in get_flashed_messages() %}
-    <div class="flash">{{msg}}<div>
+    <div class="flash">{{msg}}</div>
     {% endfor %}
     <form method="post">
         <label for="name">Имя:</label><br>
