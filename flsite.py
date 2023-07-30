@@ -1,8 +1,11 @@
 import sqlite3 as sq
-from flask import Flask, render_template, request
-from data_base.sqlite_db import sql_add_client, sql_start, base_init
+import time
+
+from flask import Flask, render_template, request, flash
+from data_base.sqlite_db import sql_add_client, base_init, check_phone_number
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'sdjlkwkwjer435kjhj234gv2349fdjh38'
 
 # Временное хранилище данных клиентов (обычно заменяется базой данных)
 clients = ()
@@ -13,9 +16,25 @@ def index():
     return render_template('index.html')
 
 
-# @app.route('/hi_page')
-# def hi():
-#     return render_template('index.html')
+@app.route('/input.html', methods=['GET', 'POST'])
+def input_client():
+    if request.method == 'POST':
+        # Получаем данные из формы
+        name = request.form['name']
+        phone = request.form['phone']
+
+        # Проверяем есть ли клиент в базе
+        base_connect = base_init()
+        name = check_phone_number(phone)
+        if name:
+            flash(f"Добро пожаловать {name}! Можете записаться на консультацию.")
+            # record_consult()
+        else:
+            flash(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
+            # time.sleep(5)
+            # return render_template('reg.html')
+        # base_connect.close()
+    return render_template('input.html')
 
 
 @app.route('/reg.html', methods=['GET', 'POST'])
