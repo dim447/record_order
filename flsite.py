@@ -1,7 +1,7 @@
 import sqlite3 as sq
 import time
 
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, jsonify, url_for, redirect, session
 from data_base.sqlite_db import sql_add_client, base_init, check_phone_number
 from handlers.client import time_consult
 
@@ -17,20 +17,28 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/order.html', methods=['GET', 'POST'])
+# @app.route('/ind')
+# def ind():
+#     return render_template('index.html')
+
+
+
+@app.route('/order', methods=['GET', 'POST'])
 def order():
+    flash(f"Добро пожаловать ! Можете записаться на консультацию.")
     if request.method == 'POST':
         # Получаем данные из формы
-        date_order = request.form['order_day']
-        base_connect = base_init()
-        time_consult(date_order)
-        if date_order:
-            flash(f"Вы выбрали {date_order}! Выберите время.")
-        base_connect.close()
+        date_order = request.form['date']
+        # base_connect = base_init()
+        # time_consult(date_order)
+        # if date_order:
+        #     flash(f"Вы выбрали {date_order}! Выберите время.")
+        # base_connect.close()
+        return redirect(url_for('booking', date=date_order))
     return render_template('order.html')
 
 
-@app.route('/input.html', methods=['GET', 'POST'])
+@app.route('/enter', methods=['GET', 'POST'])
 def input_client():
     if request.method == 'POST':
         # Получаем данные из формы
@@ -40,18 +48,19 @@ def input_client():
         # Проверяем есть ли клиент в базе
         base_connect = base_init()
         name = check_phone_number(phone)
-        if name:
-            flash(f"Добро пожаловать {name}! Можете записаться на консультацию.")
-            # record_consult()
-        else:
-            flash(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
+        # if name:
+        #     flash(f"Добро пожаловать {name}! Можете записаться на консультацию.")
+        #     # record_consult()
+        # else:
+        #     flash(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
             # time.sleep(5)
             # return render_template('reg.html')
         # base_connect.close()
-    return render_template('input.html')
+        return redirect(url_for('order', name=name))
+    return render_template('enter.html')
 
 
-@app.route('/reg.html', methods=['GET', 'POST'])
+@app.route('/reg', methods=['GET', 'POST'])
 def registration():
     if request.method == 'POST':
         # Получаем данные из формы
@@ -65,12 +74,27 @@ def registration():
         clients = (name, surname, int(age), phone, email,)
         base_connect = base_init()
         sql_add_client(clients)
-        base_connect.close()
+        # base_connect.close()
         # Отправляем клиенту сообщение об успешной регистрации (можно также перенаправить на другую страницу)
-        return f"Спасибо за регистрацию, {name}!"
+        return redirect(url_for('new'))
 
     # Если метод запроса GET, отображаем форму для регистрации
     return render_template('reg.html')
+
+
+@app.route('/new', methods=['GET', 'POST'])
+def new_index():
+    if request.method == 'POST':
+        date = request.form.get('date')
+        return redirect(url_for('booking', date=date))
+    return render_template('new.html')
+
+
+@app.route('/booking')
+def booking():
+    date = request.args.get('date', None)
+    return render_template('booking.html', date=date)
+
 
 
 if __name__ == '__main__':
