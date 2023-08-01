@@ -2,7 +2,7 @@ import sqlite3 as sq
 import time
 
 from flask import Flask, render_template, request, flash, jsonify, url_for, redirect, session
-from data_base.sqlite_db import sql_add_client, base_init, check_phone_number
+from data_base.sqlite_db import sql_add_client, base_init, check_phone_number, sql_read_free_time
 from handlers.client import time_consult
 
 app = Flask(__name__)
@@ -17,12 +17,6 @@ def index():
     return render_template('index.html')
 
 
-# @app.route('/ind')
-# def ind():
-#     return render_template('index.html')
-
-
-
 @app.route('/order', methods=['GET', 'POST'])
 def order():
     flash(f"Добро пожаловать ! Можете записаться на консультацию.")
@@ -34,6 +28,7 @@ def order():
         # if date_order:
         #     flash(f"Вы выбрали {date_order}! Выберите время.")
         # base_connect.close()
+        # print(date_order)
         return redirect(url_for('booking', date=date_order))
     return render_template('order.html')
 
@@ -82,19 +77,26 @@ def registration():
     return render_template('reg.html')
 
 
-@app.route('/new', methods=['GET', 'POST'])
-def new_index():
-    if request.method == 'POST':
-        date = request.form.get('date')
-        return redirect(url_for('booking', date=date))
-    return render_template('new.html')
+# @app.route('/new', methods=['GET', 'POST'])
+# def new_index():
+#     if request.method == 'POST':
+#         date = request.form.get('date')
+#
+#         return redirect(url_for('booking', date=date))
+#     return render_template('new.html')
 
 
-@app.route('/booking')
-def booking():
-    date = request.args.get('date', None)
-    return render_template('booking.html', date=date)
+@app.route('/booking/<date>')
+def booking(date):
+    base_connect = base_init()
+    column_names, records = sql_read_free_time(date)
+    return render_template('booking.html', column_names=column_names, records=records, date=date)
 
+
+# @app.route('/booking')
+# def booking():
+#     date = request.args.get('date', None)
+#     return render_template('booking.html', date=date)
 
 
 if __name__ == '__main__':

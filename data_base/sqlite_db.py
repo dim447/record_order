@@ -111,14 +111,28 @@ def sql_read_free_time(date):
     Проверяет по дате есть ли записи на эту дату.
     Выводит в виде таблицы часы записи и имена клиентов
     '''
+    # Assume you have the `cur` and `check_record_exists` defined elsewhere
     record_exists = check_record_exists(date)
     if record_exists:
         ret = cur.execute('SELECT * FROM shedule WHERE date = ?', (date,)).fetchone()
         column_names = [i[0] for i in cur.description]
-        print(f'Часы', *column_names[1:], sep="  ")
-        print(f'   ', *ret[1:], sep="    ")
+        return column_names, ret[1:]
     else:
-        print(f"Запись на дату {date} не найдена.")
+        return None, None
+
+# def sql_read_free_time(date):
+#     '''
+#     Проверяет по дате есть ли записи на эту дату.
+#     Выводит в виде таблицы часы записи и имена клиентов
+#     '''
+#     record_exists = check_record_exists(date)
+#     if record_exists:
+#         ret = cur.execute('SELECT * FROM shedule WHERE date = ?', (date,)).fetchone()
+#         column_names = [i[0] for i in cur.description]
+#         print(f'Часы', *column_names[1:], sep="  ")
+#         print(f'   ', *ret[1:], sep="    ")
+#     else:
+#         print(f"Запись на дату {date} не найдена.")
 
 
 def check_record_exists(key_value):

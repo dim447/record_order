@@ -1,49 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-    <meta charset="UTF-8">
-    <title>Консультация психолога</title>
-    <meta charset="utf-8">
-    <img src="https://psy-files.ru/wp-content/uploads/b/e/d/bedb6b0be2d6e1551afbb40b6738a503.jpeg">
-  </head>
-  <body>
-    <h1>Добрый день!</h1>
-    <h2>У вас есть проблемы в жизни или в делах? Мы вам поможем!</h2><br>
+  <meta charset="UTF-8">
+  <title>Консультация психолога</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div class="navbar">
+
+	<div class="logo">
+		<h1>LORA BOND</h1>
+	</div>
 
 
-    <p><strong>Paragraph</strong>:  Это программа записи на консультацию к психологу.
-    Чтобы записаться на приём добавьте ваши данные.</p><br>
+	<ul class="links">
+		<li><a href="/">Домой</a></li>
+		<li><a href="enter">Вход для клиентов</a></li>
+		<li><a href="reg">Регистрация</a></li>
+		<li><a href="#">Свяжитесь с нами</a></li>
+	</ul>
+
+
+	<div class="right">
+<!--		<button type="button"><a href="https://t.me/Larisa_Yk">Telegram</a></button>-->
+		<button><a href="https://t.me/Larisa_Yk">Telegram</a></button>
+	</div>
+
+	<div class="toggle">
+		<div class="line1"></div>
+		<div class="line2"></div>
+		<div class="line3"></div>
+	</div>
+
+
+</div>
+<main>
+	<div class="content">
     <form method="post">
       <label for="date"> Введите дату когда вы хотите записаться:</label>
       <input type="date" id="date" name="date">
       <input type="submit" value="Submit">
     </form><br>
 
+<!--     <label class="container">Один-->
+<!--        <input type="checkbox" checked="checked">-->
+<!--        <span class="checkmark"></span>-->
+<!--    </label>-->
 
+<!--    <label class="container">Два-->
+<!--        <input type="checkbox">-->
+<!--        <span class="checkmark"></span>-->
+<!--    </label>-->
 
-     <label class="container">Один
-        <input type="checkbox" checked="checked">
-        <span class="checkmark"></span>
-    </label>
+<!--    <label class="container">Три-->
+<!--        <input type="checkbox">-->
+<!--        <span class="checkmark"></span>-->
+<!--    </label>-->
 
-    <label class="container">Два
-        <input type="checkbox">
-        <span class="checkmark"></span>
-    </label>
+<!--    <label class="container">Четыре-->
+<!--        <input type="checkbox">-->
+<!--        <span class="checkmark"></span>-->
+<!--    </label>-->
+    </div>
 
-    <label class="container">Три
-        <input type="checkbox">
-        <span class="checkmark"></span>
-    </label>
+	<section>
+		<br>		<br>
+	</section>
+</main>
 
-    <label class="container">Четыре
-        <input type="checkbox">
-        <span class="checkmark"></span>
-    </label>
-
-    <div>Если вы здесь впервые, то вам необходимо зарегистрироваться. Иначе введите имя и телефон, указанные при регистрации</div>
-    <br>
-    <button type="button"><a href="/reg.html">Регистрация</a></button>
-    <button type="button"><a href="/input.html">Вход</a></button>
-  </body>
+</body>
 </html>
