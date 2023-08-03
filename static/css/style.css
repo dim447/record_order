@@ -13,10 +13,21 @@ body, button, input {
   transition: 0.4s ease all;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1 {
   margin: 0;
   color: #FFFF00;
 }
+
+h2, h3, h4, h6 {
+  margin: 0;
+  color: #4B0082;
+}
+
+h5 {
+  margin: 0;
+  color: #000000;
+}
+
 
 ul {
   padding: 0;
@@ -24,7 +35,7 @@ ul {
 }
 
 .navbar {
-  background: #000088;
+  background: #008B8B;
   color: #fff;
   padding: 15px;
   width: 100%;
@@ -36,6 +47,7 @@ ul {
 .navbar .logo {
   cursor: pointer;
   font-family: 'Rubik Vinyl', cursive;
+  color: #FFFF00;
 }
 
 .navbar ul.links {
@@ -68,6 +80,7 @@ ul {
 }
 
 button {
+  font-family: 'Open Sans', sans-serif;
   background: #ffc600;
   outline: none;
   font-weight: bold;
@@ -84,8 +97,39 @@ button:hover {
   border-color: black;
 }
 
+
+.btn {
+  font-family: 'Open Sans', sans-serif;
+  text-transform: uppercase;
+  background: #FF0000;
+  outline: none;
+  font-weight: bold;
+  padding: 10px 18px;
+  border-radius: 15px;
+  border: 1px solid #e6b200;
+  letter-spacing: 1px;
+}
+.btn-success {
+  font-family: 'Open Sans', sans-serif;
+  text-transform: uppercase;
+  background: #00FF00;
+  outline: none;
+  font-weight: bold;
+  padding: 10px 18px;
+  border-radius: 15px;
+  border: 1px solid #e6b200;
+  letter-spacing: 1px;
+}
+.btn:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+  color: white;
+  background: #FF69B4;
+  border-color: white;
+}
+
 .content {
-  background: url("http://i1.wallbox.ru/wallpapers/main2/202121/162201441660adf9d03addb9.06286780.jpg?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80") no-repeat;
+  background: url("http://builtenvironment.toolkitnwtac.com/wp-content/uploads/sites/5/2017/04/background.jpg?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80") no-repeat;
   background-size: cover;
   height: calc(95vh - 100px);
   display: flex;
@@ -96,6 +140,10 @@ button:hover {
 }
 .content h2 {
   color: #00FF00;
+}
+
+.content h4 {
+  color: #4B0082;
 }
 
 .navbar.sticky {
@@ -109,8 +157,8 @@ button:hover {
 }
 
 section {
-  background: #000088;
-  color: #ffc600;
+  background: #E0FFFF;
+  color: #0000CD;
   padding: 20px;
   font-family: 'Open Sans', sans-serif;
   font-weight: bold;

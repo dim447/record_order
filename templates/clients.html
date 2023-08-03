@@ -1,0 +1,38 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Все клиенты
+{% endblock %}
+
+<main>
+		{% block main %}
+	<div class="container mt-5">
+			<h1>Все клиенты.</h1><br>
+
+			<table>
+				<tr>
+					<td><h3>Имя и фамилия</h3></td>
+					<td><h3>Номер телефона</h3></td>
+				</tr>
+					{% for el in clients %}
+
+					<tr>
+						<td><a href="/clients/{{ el.id }}"><h4>{{ el.name }} {{ el.surname }}</h4></a></td>
+						<td><h5>{{ el.phone_number}}</h5></td>
+<!--						<td><a href="/clients/{{ el.id }}">Информация о клиенте</a></td>-->
+					</tr>
+<!--					<td>-->
+<!--						<button class="btn btn-warning">Информация о клиенте</button>-->
+<!--					</td>-->
+
+					{% endfor %}
+			</table>
+	</div>
+		{% endblock %}
+
+	<section>
+		{% block section %}
+			<br> <br>
+		{% endblock %}
+	</section>
+</main>

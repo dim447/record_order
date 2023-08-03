@@ -1,0 +1,38 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Расписание консультаций
+{% endblock %}
+
+<main>
+	<div class="content">
+		{% block main %}
+      <h1>Расписание консультаций</h1>
+<!--		<h3 id="namePara">Добро пожаловать </h3>-->
+
+<!--    <script>-->
+<!--        // JavaScript code to extract the parameter from the URL-->
+<!--        const urlParams = new URLSearchParams(window.location.search);-->
+<!--        const nameParam = urlParams.get('name');-->
+
+<!--        // JavaScript code to update the HTML content with the parameter value-->
+<!--        const nameElement = document.getElementById('namePara');-->
+<!--        nameElement.textContent += nameParam;-->
+<!--    </script>-->
+
+		<h3>Можете записаться на консультацию.</h3><br>
+			<form method="post">
+			  <label for="date"> Введите дату, чтобы посмотреть расписание :</label>
+			  <input type="date" id="date" name="date">
+			  <input type="submit" value="Посмотреть">
+			</form><br>
+		{% endblock %}
+
+    </div>
+
+	<section>
+		{% block section %}
+			<br><br>
+		{% endblock %}
+	</section>
+</main>

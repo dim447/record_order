@@ -1,60 +1,30 @@
-<!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>Консультация психолога</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<div class="navbar">
+{% extends 'base.html' %}
 
-	<div class="logo">
-		<h1>LORA BOND</h1>
-	</div>
-
-
-	<ul class="links">
-		<li><a href="/">Домой</a></li>
-		<li><a href="enter">Вход для клиентов</a></li>
-		<li><a href="reg">Регистрация</a></li>
-		<li><a href="#">Свяжитесь с нами</a></li>
-	</ul>
-
-
-	<div class="right">
-<!--		<button type="button"><a href="https://t.me/Larisa_Yk">Telegram</a></button>-->
-		<button><a href="https://t.me/Larisa_Yk">Telegram</a></button>
-	</div>
-
-	<div class="toggle">
-		<div class="line1"></div>
-		<div class="line2"></div>
-		<div class="line3"></div>
-	</div>
-
-
-</div>
-
-
+{% block title %}
+Консультация психолога
+{% endblock %}
 
 <main>
 	<div class="content">
-		<h1>Консультации профессионально.</h1>
-		<h2>by @LoraBond</h2>
+		{% block main %}
+			<h1>Консультации профессионально.</h1><br><br>
+			<h3>У вас есть проблемы в жизни или в делах?</h3>
+			<h2>Мы вам поможем!</h2><br>
+			<h4>Получите максимально качественную консультацию. Мы поможем вам справиться с проблемами.
+			<br>Это программа записи на консультацию к психологу. Чтобы записаться на приём добавьте ваши данные.	</h4><br><br>
+			<h3>by @LoraBond</h3>
+		{% endblock %}
 	</div>
 
 	<section>
-		У вас есть проблемы в жизни или в делах? Мы вам поможем! Получите максимально качественную консультацию. Мы поможем вам справиться с проблемами.
-		<br>Это программа записи на консультацию к психологу. Чтобы записаться на приём добавьте ваши данные.
+		{% block section %}
+			<br><br>
+		{% endblock %}
 	</section>
 
 
 
 </main>
 <!-- partial -->
-<!--  <script  src="./script.js"></script>-->
+  <script  src="./script.js"></script>
 
-</body>
-</html>

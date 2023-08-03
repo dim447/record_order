@@ -1,82 +1,49 @@
-<!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>Консультация психолога</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<div class="navbar">
+{% extends 'base.html' %}
 
-	<div class="logo">
-		<h1>LORA BOND</h1>
-	</div>
+{% block title %}
+Запись на консультацию
+{% endblock %}
 
-
-	<ul class="links">
-		<li><a href="/">Домой</a></li>
-		<li><a href="enter">Вход для клиентов</a></li>
-		<li><a href="reg">Регистрация</a></li>
-		<li><a href="#">Свяжитесь с нами</a></li>
-	</ul>
-
-
-	<div class="right">
-<!--		<button type="button"><a href="https://t.me/Larisa_Yk">Telegram</a></button>-->
-		<button><a href="https://t.me/Larisa_Yk">Telegram</a></button>
-	</div>
-
-	<div class="toggle">
-		<div class="line1"></div>
-		<div class="line2"></div>
-		<div class="line3"></div>
-	</div>
-
-
-</div>
 <main>
 	<div class="content">
-    <h2>Запись на консультацию.</h2>
-    <p>
-      Вы выбрали: {{ date }}
-    </p>
-		 {% if column_names and records %}
-        <table>
-            <tr>
-                <th>Часы</th>
-                {% for column_name in column_names[1:] %}
-                    <th>{{ column_name }}</th>
-                {% endfor %}
-            </tr>
-<!--            <tr>-->
-<!--                <td></td>-->
-<!--                {% for record in records %}-->
-<!--                    <td>{{ record }}</td>-->
-<!--                {% endfor %}-->
-<!--            </tr>-->
-            <tr>
-                 <td></td>
-                {% for record in records %}
-                    <td>
-                        <label class="container">
-                            <input type="checkbox" value="1111" checked="checked">
-                        <span class="checkmark"></span>
-                        </label>
-                    </td>
-                {% endfor %}
-            </tr>
-        </table>
-    {% else %}
-        <p>На данный день нет записи.</p>
-    {% endif %}
-    </div>
+        {% block main %}
+            <h2>Запись на консультацию на дату {{ date }}.</h2><br>
+
+                 {% if column_names and records %}
+                <table>
+                    <tr>
+                        <th>Часы</th>
+                        {% for column_name in column_names[1:] %}
+                            <th>{{ column_name }}</th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td></td>
+                        {% for record in records %}
+                            <td>{{ record }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                         <td></td>
+                        {% for record in records %}
+                            <td>
+                                <label class="container">
+                                    <input type="checkbox" value="1111" checked="checked">
+                                <span class="checkmark"></span>
+                                </label>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                </table>
+            {% else %}
+                <p>На данный день нет записи.</p>
+            {% endif %}
+            </div>
+        {% endblock %}
 
 	<section>
-		<br>		<br>
+		{% block section %}
+			<br><br>
+		{% endblock %}
 	</section>
 </main>
-
-</body>
-</html>

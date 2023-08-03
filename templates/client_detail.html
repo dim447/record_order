@@ -1,0 +1,36 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+{{ client.name }} {{ client.surname }}
+{% endblock %}
+
+<main>
+		{% block main %}
+	<div class="container mt-5">
+			<h1>{{ client.name }} {{ client.surname }}</h1><br>
+
+			<table>
+
+				<div class="contaner mt-5">
+
+                        <h3>Возраст: {{ client.age }}</h3>
+						<h3>Номер телефона: {{ client.phone_number }}</h3>
+                        <h3>Электронная почта: {{ client.e_mail }}</h3>
+						<h3>Заметка о клиенте: {{ client.description }}</h3><br>
+						<a href="/clients/{{ client.id }}/update"><input type="submit" value="Добавить заметку о клиенте"></a>
+						<a href="/clients/{{ client.id }}/del"><input type="submit" value="Удалить клиента"></a>
+<!--					<td>-->
+<!--						<button class="btn btn-warning">Информация о клиенте</button>-->
+<!--					</td>-->
+				</div>
+
+			</table>
+	</div>
+		{% endblock %}
+
+	<section>
+		{% block section %}
+			<br> <br>
+		{% endblock %}
+	</section>
+</main>

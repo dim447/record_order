@@ -24,13 +24,13 @@ def sql_start():
         'e_mail TEXT, '
         'description TEXT)')
     base_connect.execute('''
-           CREATE TABLE IF NOT EXISTS shedule (
+           CREATE TABLE IF NOT EXISTS sсhedule (
                date TEXT PRIMARY KEY,
-               "10-11" TEXT,
-               "11-12" TEXT,
-               "13-14" TEXT,
-               "14-15" TEXT,
-               "15-16" TEXT
+               "time10" TEXT,
+               "time11" TEXT,
+               "time13" TEXT,
+               "time14" TEXT,
+               "time15" TEXT
            )
        ''')
     base_connect.commit()
@@ -90,18 +90,18 @@ def add_client_order(date, time, name):
     if record_exists:
         pass
     else:
-        cur.execute('INSERT INTO shedule (date) VALUES (?)', [date])
+        cur.execute('INSERT INTO sсhedule (date) VALUES (?)', [date])
     match time:
         case '10-11':
-            cur.execute('UPDATE shedule SET "10-11" = ? WHERE date = ?', (name, date))
+            cur.execute('UPDATE sсhedule SET "time10" = ? WHERE date = ?', (name, date))
         case '11-12':
-            cur.execute('UPDATE shedule SET "11-12" = ? WHERE date = ?', (name, date))
+            cur.execute('UPDATE sсhedule SET "time11" = ? WHERE date = ?', (name, date))
         case '13-14':
-            cur.execute('UPDATE shedule SET "13-14" = ? WHERE date = ?', (name, date))
+            cur.execute('UPDATE sсhedule SET "time13" = ? WHERE date = ?', (name, date))
         case '14-15':
-            cur.execute('UPDATE shedule SET "14-15" = ? WHERE date = ?', (name, date))
+            cur.execute('UPDATE sсhedule SET "time14" = ? WHERE date = ?', (name, date))
         case '15-16':
-            cur.execute('UPDATE shedule SET "15-16" = ? WHERE date = ?', (name, date))
+            cur.execute('UPDATE sсhedule SET "time15" = ? WHERE date = ?', (name, date))
     base_connect.commit()
     base_connect.close()
 
@@ -111,10 +111,9 @@ def sql_read_free_time(date):
     Проверяет по дате есть ли записи на эту дату.
     Выводит в виде таблицы часы записи и имена клиентов
     '''
-    # Assume you have the `cur` and `check_record_exists` defined elsewhere
     record_exists = check_record_exists(date)
     if record_exists:
-        ret = cur.execute('SELECT * FROM shedule WHERE date = ?', (date,)).fetchone()
+        ret = cur.execute('SELECT * FROM sсhedule WHERE date = ?', (date,)).fetchone()
         column_names = [i[0] for i in cur.description]
         return column_names, ret[1:]
     else:
@@ -127,7 +126,7 @@ def sql_read_free_time(date):
 #     '''
 #     record_exists = check_record_exists(date)
 #     if record_exists:
-#         ret = cur.execute('SELECT * FROM shedule WHERE date = ?', (date,)).fetchone()
+#         ret = cur.execute('SELECT * FROM sсhedule WHERE date = ?', (date,)).fetchone()
 #         column_names = [i[0] for i in cur.description]
 #         print(f'Часы', *column_names[1:], sep="  ")
 #         print(f'   ', *ret[1:], sep="    ")
@@ -141,7 +140,7 @@ def check_record_exists(key_value):
     :param key_value: Значение ключевого поля для поиска -- дата.
     :return: True, если запись с заданным ключевым значением существует, иначе False.
     """
-    query = f"SELECT COUNT(*) FROM shedule WHERE date = ?;"
+    query = f"SELECT COUNT(*) FROM sсhedule WHERE date = ?;"
     cur.execute(query, (key_value,))
     count = cur.fetchone()[0]
     # cur.close()

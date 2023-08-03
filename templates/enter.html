@@ -1,61 +1,39 @@
-<!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>Консультация психолога</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<div class="navbar">
+{% extends 'base.html' %}
 
-	<div class="logo">
-		<h1>LORA BOND</h1>
-	</div>
+{% block title %}
+Вход для клиента
+{% endblock %}
 
-
-	<ul class="links">
-		<li><a href="/">Домой</a></li>
-		<li><a href="enter">Вход для клиентов</a></li>
-		<li><a href="reg">Регистрация</a></li>
-		<li><a href="#">Свяжитесь с нами</a></li>
-	</ul>
-
-
-	<div class="right">
-<!--		<button type="button"><a href="https://t.me/Larisa_Yk">Telegram</a></button>-->
-		<button><a href="https://t.me/Larisa_Yk">Telegram</a></button>
-	</div>
-
-	<div class="toggle">
-		<div class="line1"></div>
-		<div class="line2"></div>
-		<div class="line3"></div>
-	</div>
-
-
-</div>
 <main>
 	<div class="content">
-    <h1>Вход для записи на консультацию.</h1><br>
-    <div>Введите имя и телефон (без 8), указанные при регистрации</div>
-    <form method="post">
-        <label for="name">Имя:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+		{% block main %}
+			<h1>Вход для записи на консультацию</h1><br>
+		<div><h3>Введите имя и телефон, указанные при регистрации</h3></div><br>
+		<form method="post">
+		<table>
+				<tr>
+					<td><label for="name">Имя:</label></td>
+					<td><input type="text" id="name" name="name" placeholder="Введите имя" required></td>
+				</tr>
+				<tr>
+					<td><label for="phone">Телефон:</label></td>
+					<td><input type="tel" id="phone" name="phone" placeholder="+79876543211" required></td>
+				</tr>
+				<tr>
+					<td></td><td><input type="submit" value="Войти"></td>
+				</tr>
 
-        <label for="phone">Телефон:</label><br>
-<!--		input type="tel" value="+8400000000">-->
-        <input type="tel" id="phone" name="phone" value="+70000000000" required><br><br>
+		</table>
 
-        <input type="submit" value="Войти">
-    </form>
+
+			</form>
+		{% endblock %}
     </div>
 
 	<section>
-		<br>		<br>
+		{% block section %}
+			<br> <br>
+		{% endblock %}
 	</section>
 </main>
 
-</body>
-</html>

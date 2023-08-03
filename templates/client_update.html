@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Обновление информации о клиенте
+{% endblock %}
+
+<main>
+	<div class="content">
+		{% block main %}
+			<h1>Обновление информации о клиенте</h1>
+			<div class="contaner mt-5">
+			<form method="post">
+				<table>
+					<tr>
+						<td><label for="name">Имя:</label></td>
+						<td><input type="text" id="name" name="name" value="{{ client.name }}" required></td><br><br>
+					</tr>
+
+					<tr>
+						<td><label for="surname">Фамилия:</label></td>
+						<td><input type="text" id="surname" name="surname"  value="{{ client.surname }}" required></td><br><br>
+					</tr>
+
+					<tr>
+						<td><label for="age">Возраст:</label></td>
+						<td><input type="text" id="age" name="age" value="{{ client.age }}" required></td><br><br>
+					</tr>
+
+					<tr>
+						<td><label for="phone">Телефон:</label></td>
+						<td><input type="text" id="phone" name="phone" value="{{ client.phone_number}}" required><br><br></td>
+					</tr>
+					<tr>
+						<td><label for="email">Email:</label></td>
+						<td><input type="email" id="email" name="email" value="{{ client.e_mail }}" required><br><br></td>
+					</tr>
+
+					<tr>
+						<td><label for="description">Заметка о клиенте:</label></td>
+						<td><textarea id="description" name="description">{{ client.description }}</textarea><br><br></td>
+					</tr>
+					<tr>
+						<td><input type="submit" value="Обновить"></td>
+					</tr>
+				</table>
+			</form>
+			</div>
+		{% endblock %}
+    </div>
+
+	<section>
+		{% block section %}
+			<br><br>
+		{% endblock %}
+	</section>
+</main>

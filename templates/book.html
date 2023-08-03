@@ -1,0 +1,33 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Все клиенты
+{% endblock %}
+
+<main>
+		{% block main %}
+	<div class="container mt-5">
+			<h1>Все клиенты.</h1><br>
+
+			<table>
+				<tr>
+<!--					<td><h3>Имя и фамилия</h3></td>-->
+<!--					<td><h3>Номер телефона</h3></td>-->
+                    <h2>Запись на консультацию на дату {{ date }}.</h2><br>
+				</tr>
+						<p>Время с 10-11: Клиент: {{ schedule.time10 }}</p>
+						<p>Время с 11-12: Клиент: {{ schedule.time11 }}</p>
+						<p>Время с 13-14: Клиент: {{ schedule.time13 }}</p>
+						<p>Время с 14-15: Клиент: {{ schedule.time14 }}</p>
+						<p>Время с 15-16: Клиент: {{ schedule.time15 }}</p>
+
+			</table>
+	</div>
+		{% endblock %}
+
+	<section>
+		{% block section %}
+			<br> <br>
+		{% endblock %}
+	</section>
+</main>
