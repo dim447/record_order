@@ -12,13 +12,24 @@
 			<table>
 
 				<div class="contaner mt-5">
-
-                        <h3>Возраст: {{ client.age }}</h3>
-						<h3>Номер телефона: {{ client.phone_number }}</h3>
-                        <h3>Электронная почта: {{ client.e_mail }}</h3>
-						<h3>Заметка о клиенте: {{ client.description }}</h3><br>
-						<a href="/clients/{{ client.id }}/update"><input type="submit" value="Добавить заметку о клиенте"></a>
-						<a href="/clients/{{ client.id }}/del"><input type="submit" value="Удалить клиента"></a>
+					<tr>
+							<td><h3>Возраст: </h3></td>
+							<td><h4>{{ client.age }}</h4></td>
+					</tr>
+					<tr>
+						<td><h3>Номер телефона: </h3></td>
+						<td><h4>{{ client.phone_number }}</h4></td>
+					</tr>
+					<tr>
+                        <td><h3>Электронная почта: </h3></td>
+						<td><h4>{{ client.e_mail }}</h4></td>
+					</tr>
+					<tr>
+						<td><h3>Заметка о клиенте: </h3></td>
+						<td><h4>{{ client.description }}</h4></td>
+					</tr>
+						<td><br><a href="/clients/{{ client.id }}/update"><input type="submit" value="Добавить заметку о клиенте"></a>
+						<a href="/clients/{{ client.id }}/del"><input type="submit" value="Удалить клиента"></a><td>
 <!--					<td>-->
 <!--						<button class="btn btn-warning">Информация о клиенте</button>-->
 <!--					</td>-->
