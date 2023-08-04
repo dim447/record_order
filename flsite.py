@@ -187,7 +187,8 @@ def client_update(id):
 @app.route('/book/<date>', methods=['GET', 'POST'])
 def book(date):
     """ Расписание на дату   """
-    schedule = Sсhedule.query.get(date)
+    schedule = db.session.get(Sсhedule, date)
+    # schedule = Sсhedule.query.get(date)
     # print(schedule)
     if request.method == 'POST':
         # Получаем данные из формы
