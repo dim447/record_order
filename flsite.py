@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, flash, jsonify, url_for, redirect, session
 from flask_sqlalchemy import SQLAlchemy
-from data_base.sqlite_db import sql_add_client, base_init, check_phone_number, sql_read_free_time
+from data_base.sqlite_db import base_init, check_phone_number, sql_read_free_time, check_date_exists, \
+    base_close, add_client_order
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/idim/PycharmProjects/record_order/data_base/clients.db'
@@ -37,8 +38,8 @@ class Sсhedule(db.Model):
         return '<Schedule %r>' % self.date
 
     def __str__(self):
-        return f"Расписание на . " \
-               f"Дата: {self.date}. " \
+        return f"Расписание на  " \
+               f"дату: {self.date}. " \
                f"10-11: {self.time10}. " \
                f"11-12: {self.time11}. " \
                f"13-14: {self.time13}. " \
@@ -61,13 +62,21 @@ def enter():
         phone = request.form['phone']
 
         # Проверяем есть ли клиент в базе
-        base_connect = base_init()
-        name = check_phone_number(phone)
+        try:
+            # name = db.session.get(Clients, name1)
+            # print(name1, name)
+            base_connect, cur = base_init()
+            name, id_client = check_phone_number(phone)
+            base_close(base_connect)
+        except:
+            flash(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
+            return render_template('reg.html')
+            # return "Ошибка ввода данных"
         if name:
             if name == "admin":
                 return redirect(url_for('admin'))
             else:
-                return redirect(url_for('order', name=name))
+                return redirect(url_for('order', name=name, id=id_client))
         else:
             flash(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
             return render_template('reg.html')
@@ -99,24 +108,77 @@ def registration():
     return render_template('reg.html')
 
 
-@app.route('/order', methods=['GET', 'POST'])
-def order():
+@app.route('/order/<int:id>', methods=['GET', 'POST'])
+def order(id):
     """ Проверка свободных слотов на дату   """
+    # print(id)
     if request.method == 'POST':
         # Получаем данные из формы
         date_order = request.form['date']
-        return redirect(url_for('booking', date=date_order))
+        try:
+            record_exists = db.session.query(db.exists().where(Sсhedule.date == date_order)).scalar()
+        except:
+            return "Ошибка ввода данных"
+        if record_exists:
+            return redirect(url_for('booking', date=date_order, id=id))
+        else:
+            schedule = Sсhedule(date=date_order, time10="", time11="", time13="", time14="", time15="")
+            # Добавляем дату  расписание в базу данных
+            try:
+                db.session.add(schedule)
+                db.session.commit()
+                return redirect(url_for('booking', date=date_order, id=id))
+            except:
+                return "Ошибка ввода данных"
+            # return "На дату нет записей"
     return render_template('order.html')
 
 
-@app.route('/order_admin', methods=['GET', 'POST'])
-def order_admin():
-    """ Принт расписания на дату (для консультанта-админа)   """
+@app.route('/booking/<int:id>/<date>', methods=['GET', 'POST'])
+def booking(id, date):
+    """ Вывод свободных слотов    """
+    # print(id)
     if request.method == 'POST':
         # Получаем данные из формы
-        date_order = request.form['date']
-        return redirect(url_for('book', date=date_order))
-    return render_template('order_admin.html')
+        time_order = request.form['time_order']
+        # client = Clients.query.get(id)
+        # print(client.name, time_order)
+        return redirect(url_for('success', date=date, time=time_order, id=id))
+    else:
+        try:
+            base_connect, cur = base_init()
+            column_names, records = sql_read_free_time(date)
+            base_close(base_connect)
+            # return redirect(url_for('index'))
+            return render_template('booking.html', column_names=column_names, records=records, date=date)
+        except:
+            return "Ошибка при работе с базой"
+
+
+@app.route('/success/<int:id>/<date>=<time>')
+def success(id, date, time):
+    """ страница подтверждения записи   """
+    print(id, date, time)
+
+    try:
+        client = Clients.query.get(id)
+        schedule = db.session.get(Sсhedule, date)
+        match time:
+            case '10-11':
+                schedule.time10 = id
+            case '11-12':
+                schedule.time11 = id
+            case '13-14':
+                schedule.time13 = id
+            case '14-15':
+                schedule.time14 = id
+            case '15-16':
+                schedule.time15 = id
+        db.session.commit()
+    except:
+        return "Ошибка при работе с базой"
+
+    return render_template('success.html', date=date, time=time, client=client)
 
 
 @app.route('/admin')
@@ -125,13 +187,68 @@ def admin():
     return render_template('admin.html')
 
 
-@app.route('/booking/<date>')
-def booking(date):
-    """ Вывод свободных слотов    """
-    base_connect = base_init()
-    column_names, records = sql_read_free_time(date)
-    # return redirect(url_for('index'))
-    return render_template('booking.html', column_names=column_names, records=records, date=date)
+@app.route('/order_admin', methods=['GET', 'POST'])
+def order_admin():
+    """ Принт расписания на дату (для консультанта-админа)   """
+    if request.method == 'POST':
+        # Получаем данные из формы
+        date_order = request.form['date']
+        try:
+            record_exists = db.session.query(db.exists().where(Sсhedule.date == date_order)).scalar()
+        except:
+            return "Ошибка ввода данных"
+        # try:
+        #     base_connect, cur = base_init()
+        #     record_exists = check_date_exists(date_order)
+        #     base_close(base_connect)
+        # except:
+        #     return "Ошибка ввода данных"
+        if record_exists:
+            return redirect(url_for('book', date=date_order))
+        else:
+            return "На дату нет записей"
+    return render_template('order_admin.html')
+
+
+@app.route('/book/<date>', methods=['GET', 'POST'])
+def book(date):
+    """ Расписание на дату   """
+    client_list_name, client_list_surname = [], []
+    schedule = db.session.get(Sсhedule, date)
+    # print(schedule)
+    id_list = [schedule.time10, schedule.time11, schedule.time13, schedule.time14, schedule.time15]
+    # print(id_list)
+    for i in id_list:
+        if i != '':
+            client_list_name.append(db.session.get(Clients, i).name)
+        else:
+            client_list_name.append("Null")
+    # print(client_list_name)
+    for i in id_list:
+        if i != '':
+            client_list_surname.append(db.session.get(Clients, i).surname)
+        else:
+            client_list_surname.append("Null")
+
+    if request.method == 'POST':
+        # Получаем данные из формы
+        # schedule.date = request.form['date']
+        schedule.time10 = request.form['time10']
+        schedule.time11  = request.form['time11']
+        schedule.time13  = request.form['time13']
+        schedule.time14  = request.form['time14']
+        schedule.time15  = request.form['time15']
+
+        # Добавляем клиента в базу данных
+        try:
+            db.session.commit()
+            return redirect('/order_admin')
+        except:
+            return "Ошибка ввода данных"
+    else:
+        # Если метод запроса GET, отображаем форму для регистрации
+        return render_template('book.html', schedule=schedule, client_list_name=client_list_name,
+                               client_list_surname=client_list_surname, date=date)
 
 
 @app.route('/clients')
@@ -173,7 +290,7 @@ def client_update(id):
         client.e_mail = request.form['email']
         client.description = request.form['description']
 
-        # Добавляем клиента в базу данных
+        # Добавляем заметку о клиенте в базу данных
         try:
             db.session.commit()
             return redirect('/clients')
@@ -182,32 +299,6 @@ def client_update(id):
     else:
         # Если метод запроса GET, отображаем форму для регистрации
         return render_template('client_update.html', client=client)
-
-
-@app.route('/book/<date>', methods=['GET', 'POST'])
-def book(date):
-    """ Расписание на дату   """
-    schedule = db.session.get(Sсhedule, date)
-    # schedule = Sсhedule.query.get(date)
-    # print(schedule)
-    if request.method == 'POST':
-        # Получаем данные из формы
-        schedule.date = request.form['date']
-        schedule.time10 = request.form['time10']
-        schedule.time11 = request.form['time11']
-        schedule.time13 = request.form['time13']
-        schedule.time14 = request.form['time14']
-        schedule.time15 = request.form['time15']
-
-        # Добавляем клиента в базу данных
-        try:
-            # db.session.commit()
-            return redirect('/order')
-        except:
-            return "Ошибка ввода данных"
-    else:
-        # Если метод запроса GET, отображаем форму для регистрации
-        return render_template('book.html', schedule=schedule, date=date)
 
 
 if __name__ == '__main__':

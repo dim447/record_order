@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Регистрация клиента
+Запись на консультацию клиента
 {% endblock %}
 
 <main>
 	<div class="content">
 		{% block main %}
-		<h3 id="namePara">Добро пожаловать </h3>
+		<h3 id="namePara">Добро пожаловать, </h3>
 
     <script>
         // JavaScript code to extract the parameter from the URL
@@ -20,11 +20,24 @@
     </script>
 
 		<h3>Можете записаться на консультацию.</h3><br>
-			<form method="post">
-			  <label for="date"> Введите дату когда вы хотите записаться:</label>
-			  <input type="date" id="date" name="date">
-			  <input type="submit" value="Submit">
-			</form><br>
+
+				<form method="post">
+					<table>
+			  			<tr>
+							<label for="date"> Введите дату на которую вы хотите записаться:</label>
+							<input type="date" id="date" name="date">
+							<input type="submit" value="Submit">
+
+						</tr>
+<!--							<div class="box">-->
+						<tr>
+
+<!--							</div>-->
+						</tr>
+
+					</table>
+				</form><br>
+
 		{% endblock %}
 
     </div>

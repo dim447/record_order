@@ -7,33 +7,71 @@
 <main>
 	<div class="content">
         {% block main %}
-            <h2>Запись на консультацию на дату {{ date }}.</h2><br>
+            <h2>Запись на консультацию на дату {{ date }}</h2><br>
 
                  {% if column_names and records %}
                 <table>
                     <tr>
-                        <th>Часы</th>
-                        {% for column_name in column_names[1:] %}
-                            <th>{{ column_name }}</th>
-                        {% endfor %}
+                        <th><h3>Время: </h3></th>
+                            <th>10-11</th>
+                            <th>11-12</th>
+                            <th>13-14</th>
+                            <th>14-15</th>
+                            <th>15-16</th>
+
                     </tr>
-                    <tr>
-                        <td></td>
-                        {% for record in records %}
-                            <td>{{ record }}</td>
-                        {% endfor %}
-                    </tr>
+<!--                    <tr>-->
+<!--                        <td></td>-->
+<!--                        {% for record in records %}-->
+<!--                            <td>{{ record }}</td>-->
+<!--                        {% endfor %}-->
+<!--                    </tr>-->
                     <tr>
                          <td></td>
                         {% for record in records %}
                             <td>
                                 <label class="container">
-                                    <input type="checkbox" value="1111" checked="checked">
+                                    {% if record %}
+                                        <input type="checkbox" value="1111" checked="checked">
+                                    {% else %}
+                                        <input type="checkbox" value="1111">
+                                    {% endif %}
                                 <span class="checkmark"></span>
                                 </label>
                             </td>
                         {% endfor %}
+
                     </tr>
+                </table>
+                <table>
+                    <form method="post">
+                        <tr>
+                            <td>
+                                <h3>Выберите время, на которое вы хотите записаться:<br>
+                                Учитывайте, что отмеченное выше время консультации уже занято</h3>
+                            </td>
+                            <tr>
+                            </tr>
+
+
+                            <td>
+                                <select id="time_order" name="time_order">
+                                  <option value="10-11">Запись на 10 часов</option>
+                                  <option value="11-12">Запись на 11 часов</option>
+                                  <option value="13-14">Запись на 13 часов</option>
+                                  <option value="14-15">Запись на 14 часов</option>
+                                  <option value="15-16">Запись на 15 часов</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="submit" value="Выбрать">
+                            </td>
+                        </tr>
+                    </form>
+
+
                 </table>
             {% else %}
                 <p>На данный день нет записи.</p>

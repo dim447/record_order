@@ -6,9 +6,21 @@ name_clients = []
 
 def base_init():
     global base_connect, cur
-    base_connect = sq.connect('data_base/clients.db')
-    cur = base_connect.cursor()
+    base_connect = None
+    try:
+        base_connect = sq.connect('data_base/clients.db')
+        cur = base_connect.cursor()
+        print("Соединение с базой данных SQLite успешно установлено.")
+        return base_connect, cur
+    except sq.Error as e:
+        print(f"Ошибка при соединении с базой данных: {e}")
     return base_connect, cur
+
+
+def base_close(base_connect):
+    if base_connect:
+        base_connect.close()
+        print("Соединение с базой данных SQLite закрыто.")
 
 
 def sql_start():
@@ -86,7 +98,7 @@ def add_client_order(date, time, name):
     :param name: имя клиента
     :return:
     '''
-    record_exists = check_record_exists(date)
+    record_exists = check_date_exists(date)
     if record_exists:
         pass
     else:
@@ -111,7 +123,7 @@ def sql_read_free_time(date):
     Проверяет по дате есть ли записи на эту дату.
     Выводит в виде таблицы часы записи и имена клиентов
     '''
-    record_exists = check_record_exists(date)
+    record_exists = check_date_exists(date)
     if record_exists:
         ret = cur.execute('SELECT * FROM sсhedule WHERE date = ?', (date,)).fetchone()
         column_names = [i[0] for i in cur.description]
@@ -134,7 +146,7 @@ def sql_read_free_time(date):
 #         print(f"Запись на дату {date} не найдена.")
 
 
-def check_record_exists(key_value):
+def check_date_exists(key_value):
     """
     Проверяет наличие записи в таблице по ключевому полю и его значению.
     :param key_value: Значение ключевого поля для поиска -- дата.
@@ -160,4 +172,4 @@ def check_phone_number(phone_number):
     # Закрываем соединение
     # base_connect.close()
     # Если запрос вернул запись, значит телефонный номер найден в базе данных
-    return row[1] if row else None
+    return row[1], row[0] if row else None

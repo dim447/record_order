@@ -7,21 +7,45 @@
 <main>
 		{% block main %}
 	<div class="container mt-5">
-			<h1>Запись на консультацию<br> на дату {{ date }}.</h1><br>
-
+			<h2>Запись на консультацию на дату {{ date }}.</h2><br>
+			<form method="post">
 			<table>
 				<tr>
 <!--					<td><h3>Имя и фамилия</h3></td>-->
 <!--					<td><h3>Номер телефона</h3></td>-->
 <!--                    <h2>Запись на консультацию на дату {{ date }}.</h2><br>-->
 				</tr>
-						<h4>Время с 10-11: Клиент: {{ schedule.time10 }}</h4>
-						<h4>Время с 11-12: Клиент: {{ schedule.time11 }}</h4>
-						<h4>Время с 13-14: Клиент: {{ schedule.time13 }}</h4>
-						<h4>Время с 14-15: Клиент: {{ schedule.time14 }}</h4>
-						<h4>Время с 15-16: Клиент: {{ schedule.time15 }}</h4>
+					<tr>
+						<td><label for="time10">Время с 10-11: Клиент: </label></td>
+						<td><input type="text" id="time10" name="time10"
+								   value="{{ client_list_name[0] }} {{ client_list_surname[0] }}"></td>
+					</tr>
+					<tr>
+						<td><label for="time11">Время с 11-12: Клиент: </label></td>
+						<td><input type="text" id="time11" name="time11"
+								   value="{{ client_list_name[1] }} {{ client_list_surname[1] }}"></td>
+					</tr>
+					<tr>
+						<td><label for="time13">Время с 13-14: Клиент: </label></td>
+						<td><input type="text" id="time13" name="time13"
+								   value="{{ client_list_name[2] }} {{ client_list_surname[2] }}"></td>
+					</tr>
+					<tr>
+						<td><label for="time14">Время с 14-15: Клиент: </label></td>
+						<td><input type="text" id="time14" name="time14"
+								   value="{{ client_list_name[3] }} {{ client_list_surname[3] }}"></td>
+					</tr>
+					<tr>
+						<td><label for="time15">Время с 15-16: Клиент: </label></td>
+						<td><input type="text" id="time15" name="time15"
+								   value="{{ client_list_name[4] }} {{ client_list_surname[4] }}"></td>
+					</tr>
+					<tr>
+						<td><input type="submit" value="Записаться"></td>
+					</tr>
 
 			</table>
+			</form>
 	</div>
 		{% endblock %}
 

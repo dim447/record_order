@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Вы записались на консультацию
+{% endblock %}
+
+
+
+<main>
+	<div class="content">
+        {% block main %}
+		<h1>Поздравляю, {{ client.name }} {{ client.surname }}!</h1>
+           <h2>Вы записались на {{ date }}  время: {{ time }}</h2>
+        {% endblock %}
+	</div>
+
+	<section>
+		{% block section %}
+			<br><br>
+		{% endblock %}
+	</section>
+</main>
