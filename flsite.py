@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, flash, jsonify, url_for, redirect, session
 from flask_sqlalchemy import SQLAlchemy
-from data_base.sqlite_db import base_init, check_phone_number, sql_read_free_time, check_date_exists, \
-    base_close, add_client_order
+from data_base.sqlite_db import base_init, check_phone_number, sql_read_free_time, base_close
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/idim/PycharmProjects/record_order/data_base/clients.db'
