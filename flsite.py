@@ -160,7 +160,7 @@ def success(id, date, time):
     print(id, date, time)
 
     try:
-        client = Clients.query.get(id)
+        client = db.session.get(Clients, id)
         schedule = db.session.get(Sсhedule, date)
         match time:
             case '10-11':
@@ -233,10 +233,10 @@ def book(date):
         # Получаем данные из формы
         # schedule.date = request.form['date']
         schedule.time10 = request.form['time10']
-        schedule.time11  = request.form['time11']
-        schedule.time13  = request.form['time13']
-        schedule.time14  = request.form['time14']
-        schedule.time15  = request.form['time15']
+        schedule.time11 = request.form['time11']
+        schedule.time13 = request.form['time13']
+        schedule.time14 = request.form['time14']
+        schedule.time15 = request.form['time15']
 
         # Добавляем клиента в базу данных
         try:
