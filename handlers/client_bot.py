@@ -1,17 +1,35 @@
 from aiogram import types
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import StatesGroup, State
+
 from create_bot import bot, dp
-import json
-from handlers.excursions import get_one_excursion
+from data_base.sqlite_db import base_init, check_phone_number, base_close, sql_add_client
 from keyboards import inline_kb
-from keyboards.client_kb import kb_client
-from handlers.weather import get_weather
-from handlers.fact import get_fact
-from data_base import sqlite_db
-import datetime
+from keyboards.client_kb import kb_client, kb_order
+import re
+
+
+class FSMReg(StatesGroup):
+    name = State()
+    surname = State()
+    age = State()
+    phone_number = State()
+    e_mail = State()
+
+
+class FSMAdmin(StatesGroup):
+    surname = State()
+    phone_number = State()
+
+
+class NumberError(Exception):
+    pass
+
+
 
 HI = '''
-(f"Здарова, _{message.from_user.username}_! "
-                             f"Какие люди! \nВот не ожидал тебя тут увидеть, бро \U0001F91D \nНачнём: жми  /start", parse_mode="Markdown", reply_markup=kb_client)
+(f"Добрый день, _{message.from_user.username}_! "
+f"\nНачнём: жми  /start", parse_mode="Markdown", reply_markup=kb_client)
 '''
 HELP = ''' Итак, вот что я умею:\n-------------------------- -->\n
 - /start                            - запуск бота
@@ -23,15 +41,13 @@ HELP = ''' Итак, вот что я умею:\n-------------------------- -->\
 - Курсы валют              - курсы ЦБ (USD, EURO, CNY)
 
 '''
-# - курсы криптовалют (BTC, ETH), \n - Стоимость бензина в Анапе.
-a = datetime.datetime.today().strftime("%d-%m-%Y")
 
 
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
     await message.answer(f"Привет, _{message.from_user.username}_! \nНачнём: --->\n"
                          f"Поздоровайся  с ботом - набери 'Привет' или 'Hi'\nили жми /help для информации",
-                         parse_mode="Markdown")
+                         parse_mode="Markdown", reply_markup=kb_client)
     await message.delete()
 
 
@@ -41,96 +57,141 @@ async def start_command(message: types.Message):
     await message.delete()
 
 
-@dp.message_handler(lambda message: 'Фотографии Анапы' in message.text)
-async def photo_command(message: types.Message):
-    await sqlite_db.sql_read(message)
-    # await message.delete()
+def validate_phone_number(phone_number):
+    # Паттерн для проверки номера телефона в формате +7XXXXXXXXXX
+    pattern = r'^\+7\d{10}$'
+    if re.match(pattern, phone_number):
+        return True
+    else:
+        return False
 
 
-# @dp.message_handler(lambda message: 'Стоимость топлива в Анапе' in message.text)
-# async def gas_price(message: types.Message):
-#     for keys in news_keys:
-#         await bot.send_message(message.from_user.id, f'\n\n"{data_azs[keys][0]}" \n{data_azs[keys][1]}')
-#         i = 0
-#         while i < len(data_azs[keys][2]):
-#             await bot.send_message(message.from_user.id, f'{data_azs[keys][2][i]} : {data_azs[keys][2][i + 1]}')
-#             i += 2
-#     # await bot.send_message(message.from_user.id, "Стоимость")
+# Ловим фамилию и телефон для проверки клиента в базе
+@dp.message_handler(text='Вход', state="*")
+async def enter_start(message: types.Message, state: FSMContext):
+    await message.answer("Введите фамилию")
+    await state.set_state(FSMAdmin.surname.state)
+    await message.delete()
 
 
-@dp.message_handler(lambda message: 'Интересный факт' in message.text)
-async def fact(message: types.Message):
-    one_fact = get_fact()
-    await bot.send_message(message.from_user.id, one_fact)
-    # await message.delete()
+@dp.message_handler(state=FSMAdmin.surname)
+async def load_name(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['surname'] = message.text
+    await FSMAdmin.next()
+    await message.reply("Введите телефон")
 
 
-@dp.message_handler(lambda message: 'Новости Анапы' in message.text)
-async def news_func(message: types.Message):
-    with open("handlers/news.json", "r") as read_file:
-        data = json.load(read_file)
-        news_keys = list(data.keys())
-        i = 0
-        for keys in news_keys:
-            date_news = data[keys][0]
-            titles_news = data[keys][1]
-            news_news = data[keys][2]
-            await bot.send_message(message.from_user.id, f"{date_news}: \n_{titles_news}_", parse_mode="Markdown")
-            await bot.send_message(message.from_user.id, news_news)
-            i += 1
-    # await message.delete()
+@dp.message_handler(state=FSMAdmin.phone_number)
+async def load_phone(message: types.Message, state: FSMContext):
+
+    if validate_phone_number(message.text):
+        async with state.proxy() as data:
+            data['phone_number'] = message.text
+            try:
+                """ Проверка клиента на присутствие в базе данных """
+                base_connect, cur = base_init()
+                name, id_client = check_phone_number(data['phone_number'])
+                base_close(base_connect)
+                await message.answer(f'{name}, Вы вошли, запишитесь на консультацию.', reply_markup=kb_order)
+            except:
+                await message.answer(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
+
+    else:
+        await message.reply(
+            f"Номер телефона невереного формата.\nПовторите ввод фамилии и номер телефона в формате +79876543210\nЖмите кнопку 'Вход'")
+        # await load_phone(message, state=FSMAdmin.phone_number)
+
+    # if name:
+    #     if name == "admin":
+    #         pass
+    #     else:
+    #         pass
+    # else:
+    #     await message.answer(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
+    #     pass
+    # await message.answer(f'{data["surname"]}, Вы вошли...')
+    await state.finish()
 
 
-@dp.message_handler(lambda message: 'Погода в Анапе' in message.text)
-async def weather(message: types.Message):
-    all_data = get_weather('anapa')
-    await bot.send_message(message.from_user.id, all_data)
+@dp.message_handler(text='Регистрация', state="*")
+async def reg_client(message: types.Message):
+    """ Регистрация клиента  """
+    await FSMReg.name.set()
+    await message.answer("Введите имя")
 
 
-@dp.message_handler(lambda message: 'Экскурсии в Анапе' in message.text)
-async def excurs(message: types.Message):
-    one_excurs = get_one_excursion()
-    photo = one_excurs[4]
-    await bot.send_message(message.from_user.id, f'_{one_excurs[0]}_\n-----------------\n{one_excurs[1]}\n-----------------\n{one_excurs[2]}\n_{one_excurs[3]}_ (Цены ориентировочные)', parse_mode="Markdown")
-    # await bot.send_message(message.from_user.id, one_excurs[4])
-    # photo = open(f'../img/{key_random}.jpg', 'rb')
-    # photo = InputFile("files/test.png")
-    #
-    await bot.send_photo(chat_id=message.chat.id, photo=photo)
-
-@dp.message_handler(lambda message: 'Курсы валют' in message.text)
-async def curr(message: types.Message):
-    with open("handlers/currency.json", "r") as read_file:
-        data = json.load(read_file)
-        usd_curs = data['USD']
-        eur_curs = data['EUR']
-        cny_curs = data['CNY']
-    await message.answer(f'Курс Центробанка РФ на {a}')
-    await message.answer(f'USD  : {usd_curs}')
-    await message.answer(f'EURO : {eur_curs}')
-    await message.answer(f'Юань : {cny_curs}')
+# Ловим первый ответ
+@dp.message_handler(content_types=['text'], state=FSMReg.name)
+async def load_name(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['name'] = message.text
+    await FSMReg.next()
+    await message.reply("Введите фамилию")
 
 
-# @dp.callback_query_handler(text='crypto')
-# async def parce(callback: types.CallbackQuery):
-#     curs_cr = get_currency_crypto('BTC')
-#     await callback.message.answer(f'Курс Bitcoin на {a}: {curs_cr}')
-#     curs_cr = get_currency_crypto('ETH')
-#     await callback.message.answer(f'Курс Ethreum на {a}: {curs_cr}')
-#     await callback.answer()
+# Ловим второй ответ
+@dp.message_handler(state=FSMReg.surname)
+async def load_name(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['surname'] = message.text
+    await FSMReg.next()
+    await message.reply("Введите ваш возраст")
+
+
+# Ловим третий ответ
+@dp.message_handler(state=FSMReg.age)
+async def load_name(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['age'] = message.text
+    await FSMReg.next()
+    await message.reply("Введите номер телефона")
+
+
+# Ловим четвертый ответ
+@dp.message_handler(state=FSMReg.phone_number)
+async def load_name(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['phone_number'] = message.text
+    await FSMReg.next()
+    await message.reply("Введите электронную почту'")
+
+
+# Ловим пятый ответ
+@dp.message_handler(state=FSMReg.e_mail)
+async def load_description(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['e_mail'] = message.text
+    # await sqlite_db.sql_add_command(state)
+    client = (data['name'], data['surname'], data['age'], data['phone_number'], data['e_mail'])
+    # print(client)
+    try:
+        base_connect, cur = base_init()
+        sql_add_client(client)
+        base_close(base_connect)
+    except:
+        return "Ошибка ввода данных"
+    await state.finish()
+    await message.answer(f'{data["name"]}, Вы успешно зарегистрировались, '
+                         f'запишитесь на консультацию.', reply_markup=kb_order)
+
+
+@dp.message_handler(text='Запись на консультацию')
+async def order_client(message: types.Message):
+    """ Запись на консультацию  """
+    await message.answer("Введите дату")
 
 
 """ ********** Улавливаем текст с кнопки **************"""
 
-
-@dp.message_handler(content_types=['text'])
-async def echo_send(message: types.Message):
-    if message.text == "Привет" or message.text == 'привет' or message.text == 'hi' or message.text == 'Hi' or message.text == 'HI':
-        await message.answer(f"Здарова, _{message.from_user.username}_! "
-                             f"Какие люди! \nВот не ожидал тебя тут увидеть, бро \U0001F91D \nНачнём: жми  /help",
-                             parse_mode="Markdown")
-    else:
-        await message.answer(f"УПС \U0001F914, _{message.from_user.username}_! "
-                             f"Такой команды нет, бро \U0001F91D \nНачнём: жми  /help",
-                             parse_mode="Markdown", reply_markup=kb_client)
-        await message.delete()
+# @dp.message_handler(content_types=['text'])
+# async def echo_send(message: types.Message):
+#     if message.text == "Привет" or message.text == 'привет' or message.text == 'hi' or message.text == 'Hi' or message.text == 'HI':
+#         await message.answer(f"Здарова, _{message.from_user.username}_! "
+#                              f"Какие люди! \nВот не ожидал тебя тут увидеть, бро \U0001F91D \nНачнём: жми  /help",
+#                              parse_mode="Markdown")
+#     else:
+#         await message.answer(f"УПС \U0001F914, _{message.from_user.username}_! "
+#                              f"Такой команды нет, бро \U0001F91D \nНачнём: жми  /help",
+#                              parse_mode="Markdown", reply_markup=kb_client)
+#         await message.delete()
