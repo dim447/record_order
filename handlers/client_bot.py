@@ -6,9 +6,10 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 from create_bot import bot, dp
 from data_base.sqlite_db import base_init, check_phone_number, base_close, sql_add_client, sql_read_free_time
-from keyboards import inline_kb
-from keyboards.client_kb import kb_client, kb_order
+from keyboards.client_kb import kb_client, kb_order, kb_order_time, time_keyb
 import re
+
+
 
 
 class FSMReg(StatesGroup):
@@ -37,8 +38,8 @@ HELP = ''' Итак, вот что умеет бот:\n-------------------------
 - /help             - информация о том, что делает бот
 - кнопка "Вход"     - вход для зарегистрированных клиентов
 - кнопка "Регистрация" - регистрация клиента
-После регистрации или входа вы можете получить 
-доступ для записи на консультацию
+После регистрации или входа вы можете получить доступ 
+для записи на консультацию
 '''
 
 
@@ -177,27 +178,36 @@ async def order_client(message: types.Message):
     await message.answer("Введите дату")
 
 
-@dp.message_handler(state=FSMDate.date_order)  # Вводим дату начала чартера
+@dp.message_handler(state=FSMDate.date_order)  # Вводим дату записи консультации
 async def get_date_order(message: types.Message, state: FSMContext):
     try:
         datetime.date.fromisoformat(message.text)
         async with state.proxy() as data:
             data_order = message.text
         await state.finish()
-        await message.answer(f"Посмотрите свободные часы на {data_order}")
+        await message.answer(f"Посмотрите свободные часы на {data_order}", reply_markup=kb_order_time)
         try:
             base_connect, cur = base_init()
             column_names, records = sql_read_free_time(data_order)
             base_close(base_connect)
-            print(column_names[1:], records)
-            await message.answer(column_names, records)
+            column_names_str = ('10-11', '11-12', '13-14', '14-15', '15-16')
+            for _ in range(len(column_names[1:]) + 1):
+                if records[_]:
+                    await message.answer(f'Время {column_names_str[_]} -- > Занято')
+                else:
+                    await message.answer(f'Время {column_names_str[_]} -- > Свободно')
         except:
             return "Ошибка при работе с базой"
-
+        await message.reply(f"Выберите время для записи", reply_markup=kb_order_time)
     except ValueError:
         await message.reply(f'Вы ввели не правильную дату, попробуйте еще раз! \n')
+    await message.delete()
 
 
+@dp.message_handler(text='Выбрать время для консультации')
+async def new_search(message: types.Message):
+    await message.answer(f'\nОтлично, давайте выберем свободное время ...', reply_markup=time_keyb)
+    await message.delete()
 
 
 """ ********** Улавливаем текст с кнопки **************"""
