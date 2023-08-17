@@ -1,10 +1,6 @@
 from flask import Flask, render_template, request, flash, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
-
 from data_base.sqlite_db import base_init, check_phone_number, base_close, sql_read_free_time
-
-# from sweater import app, db
-# from sweater.models import Clients, Sсhedule
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/idim/PycharmProjects/record_order/data_base/clients.db'
@@ -25,6 +21,10 @@ class Clients(db.Model):
 
     def __repr__(self):
         return '<Clients %r>' % self.name
+
+    def __str__(self):
+        return  f"Имя: {self.name} \n" \
+                f"Фамилия: {self.surname} "
 
 
 class Sсhedule(db.Model):
