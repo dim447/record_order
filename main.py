@@ -23,8 +23,8 @@ class Clients(db.Model):
         return '<Clients %r>' % self.name
 
     def __str__(self):
-        return  f"Имя: {self.name} \n" \
-                f"Фамилия: {self.surname} "
+        return f"Имя: {self.name} \n" \
+               f"Фамилия: {self.surname} "
 
 
 class Sсhedule(db.Model):

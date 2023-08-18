@@ -28,7 +28,7 @@ class FSMDate(StatesGroup):
 
 
 client_session = ()
-data_order_session= None
+data_order_session = None
 
 HI = '''
 (f"Добрый день, _{message.from_user.username}_! "
@@ -111,6 +111,7 @@ async def load_phone(message: types.Message, state: FSMContext):
         await message.reply(
             f"Номер телефона невереного формата.\nПовторите ввод фамилии и номер телефона в формате +7**********")
     # return client_session
+
 
 # ********** Блок регистрации клиента **************
 @dp.message_handler(text='Регистрация', state="*")
