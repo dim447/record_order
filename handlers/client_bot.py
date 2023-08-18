@@ -3,13 +3,12 @@ import datetime
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
-
+from aiogram.dispatcher.filters import Text
 from create_bot import bot, dp
-from data_base.sqlite_db import base_init, check_phone_number, base_close, sql_add_client, sql_read_free_time
+from data_base.sqlite_db import base_init, check_phone_number, base_close, sql_add_client, sql_read_free_time, \
+    add_client_order
 from keyboards.client_kb import kb_client, kb_order, kb_order_time, time_keyb
 import re
-
-
 
 
 class FSMReg(StatesGroup):
@@ -29,15 +28,18 @@ class FSMDate(StatesGroup):
     date_order = State()
 
 
+client_session = ()
+data_order_session= None
+
 HI = '''
 (f"Добрый день, _{message.from_user.username}_! "
 f"\nНачнём: жми  /start", parse_mode="Markdown", reply_markup=kb_client)
 '''
 HELP = ''' Итак, вот что умеет бот:\n-------------------------- -->\n
-- /start            - начало работы с ботом
-- /help             - информация о том, что делает бот
-- кнопка "Вход"     - вход для зарегистрированных клиентов
-- кнопка "Регистрация" - регистрация клиента
+- /start                - начало работы с ботом
+- /help                 - информация о том, что делает бот
+- кнопка "Вход"         - вход для зарегистрированных клиентов
+- кнопка "Регистрация"  - регистрация клиента
 После регистрации или входа вы можете получить доступ 
 для записи на консультацию
 '''
@@ -54,6 +56,12 @@ async def start_command(message: types.Message):
 @dp.message_handler(commands=['help'])
 async def help_command(message: types.Message):
     await bot.send_message(message.from_user.id, HELP, reply_markup=kb_client)
+    await message.delete()
+
+
+@dp.message_handler(text='В начало')
+async def help_command(message: types.Message):
+    await message.answer(f'fghgh {message.from_user.id}, {HELP}', reply_markup=kb_client)
     await message.delete()
 
 
@@ -85,22 +93,25 @@ async def load_name(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=FSMAdmin.phone_number)
 async def load_phone(message: types.Message, state: FSMContext):
-        if validate_phone_number(message.text):
-            async with state.proxy() as data:
-                data['phone_number'] = message.text
-                try:
-                    """ Проверка клиента на присутствие в базе данных """
-                    base_connect, cur = base_init()
-                    name, id_client = check_phone_number(data['phone_number'])
-                    base_close(base_connect)
-                    await state.finish()
-                    await message.answer(f'{name}, Вы вошли, запишитесь на консультацию.', reply_markup=kb_order)
-                except:
-                    await message.answer(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
-        else:
-            await message.reply(
-                f"Номер телефона невереного формата.\nПовторите ввод фамилии и номер телефона в формате +7**********")
-
+    global client_session
+    if validate_phone_number(message.text):
+        async with state.proxy() as data:
+            data['phone_number'] = message.text
+            try:
+                """ Проверка клиента на присутствие в базе данных """
+                base_connect, cur = base_init()
+                name, id_client = check_phone_number(data['phone_number'])
+                client_session = (id_client, name, data['phone_number'])
+                print(client_session)
+                base_close(base_connect)
+                await state.finish()
+                await message.answer(f'{name}, Вы вошли, запишитесь на консультацию.', reply_markup=kb_order)
+            except:
+                await message.answer(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
+    else:
+        await message.reply(
+            f"Номер телефона невереного формата.\nПовторите ввод фамилии и номер телефона в формате +7**********")
+    # return client_session
 
 # ********** Блок регистрации клиента **************
 @dp.message_handler(text='Регистрация', state="*")
@@ -167,6 +178,8 @@ async def load_description(message: types.Message, state: FSMContext):
     await state.finish()
     await message.answer(f'{data["name"]}, Вы успешно зарегистрировались, '
                          f'запишитесь на консультацию.', reply_markup=kb_order)
+
+
 # ********** Конец Блока регистрации клиента **************
 
 
@@ -180,15 +193,16 @@ async def order_client(message: types.Message):
 
 @dp.message_handler(state=FSMDate.date_order)  # Вводим дату записи консультации
 async def get_date_order(message: types.Message, state: FSMContext):
+    global data_order_session
     try:
         datetime.date.fromisoformat(message.text)
         async with state.proxy() as data:
-            data_order = message.text
+            data_order_session = message.text
         await state.finish()
-        await message.answer(f"Посмотрите свободные часы на {data_order}", reply_markup=kb_order_time)
+        await message.answer(f"Посмотрите свободные часы на {data_order_session}", reply_markup=kb_order_time)
         try:
             base_connect, cur = base_init()
-            column_names, records = sql_read_free_time(data_order)
+            column_names, records = sql_read_free_time(data_order_session)
             base_close(base_connect)
             column_names_str = ('10-11', '11-12', '13-14', '14-15', '15-16')
             for _ in range(len(column_names[1:]) + 1):
@@ -202,12 +216,22 @@ async def get_date_order(message: types.Message, state: FSMContext):
     except ValueError:
         await message.reply(f'Вы ввели не правильную дату, попробуйте еще раз! \n')
     await message.delete()
+    # return data_order
 
 
 @dp.message_handler(text='Выбрать время для консультации')
 async def new_search(message: types.Message):
-    await message.answer(f'\nОтлично, давайте выберем свободное время ...', reply_markup=time_keyb)
+    await message.answer(f'\nОтлично, {client_session[1]}, давайте выберем свободное время ...', reply_markup=time_keyb)
     await message.delete()
+
+
+@dp.callback_query_handler(Text(startswith="time"))
+async def callbacks_time(callback: types.CallbackQuery):
+    action_time = callback.data.split("_")[1]
+    print(action_time)
+    base_connect, cur = base_init()
+    add_client_order(data_order_session, action_time, client_session[0])
+    base_close(base_connect)
 
 
 """ ********** Улавливаем текст с кнопки **************"""
