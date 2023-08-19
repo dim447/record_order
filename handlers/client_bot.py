@@ -102,7 +102,7 @@ async def load_phone(message: types.Message, state: FSMContext):
                 base_connect, cur = base_init()
                 name, id_client = check_phone_number(data['phone_number'])
                 client_session = (id_client, name, data['phone_number'])
-                print(client_session)
+                # print(client_session)
                 base_close(base_connect)
                 await state.finish()
                 await message.answer(f'{name}, Вы вошли, запишитесь на консультацию.\n', reply_markup=kb_order)
@@ -235,7 +235,7 @@ async def callbacks_time(callback: types.CallbackQuery):
     add_client_order(data_order_session, action_time, client_session[0])
     base_close(base_connect)
     await callback.answer(f'Супер, {client_session[1]}, вы записались на {data_order_session}'
-                         f' начало сеанса: {action_time}')
+                          f' начало сеанса: {action_time}')
     # await message.answer('Поздравляю!', reply_markup=kb_order)
 
 
