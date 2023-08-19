@@ -3,6 +3,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher.filters import Text
+
 from create_bot import bot, dp
 from data_base.sqlite_db import base_init, check_phone_number, base_close, sql_add_client, sql_read_free_time, \
     add_client_order
@@ -48,7 +49,7 @@ HELP = ''' Итак, вот что умеет бот:\n-------------------------
 async def start_command(message: types.Message):
     await message.answer(f"Добрый день, _{message.from_user.username}_! \nНачнём: --->\n"
                          f"Чтобы узнать, как записаться на консультацию,\nжмите /help для информации",
-                         parse_mode="Markdown")
+                         parse_mode="Markdown", reply_markup=types.ReplyKeyboardRemove())
     await message.delete()
 
 
@@ -60,7 +61,7 @@ async def help_command(message: types.Message):
 
 @dp.message_handler(text='В начало')
 async def help_command(message: types.Message):
-    await message.answer(f'fghgh {message.from_user.id}, {HELP}', reply_markup=kb_client)
+    await message.answer(f'В начало {message.from_user.id}, {HELP}', reply_markup=kb_client)
     await message.delete()
 
 
@@ -77,7 +78,7 @@ def validate_phone_number(phone_number):
 # Ловим фамилию и телефон для проверки клиента в базе
 @dp.message_handler(text='Вход', state="*")
 async def enter_start(message: types.Message, state: FSMContext):
-    await message.answer("Введите фамилию или имя")
+    await message.answer("Введите фамилию или имя", reply_markup=types.ReplyKeyboardRemove())
     await state.set_state(FSMAdmin.surname.state)
     await message.delete()
 
@@ -104,7 +105,7 @@ async def load_phone(message: types.Message, state: FSMContext):
                 print(client_session)
                 base_close(base_connect)
                 await state.finish()
-                await message.answer(f'{name}, Вы вошли, запишитесь на консультацию.', reply_markup=kb_order)
+                await message.answer(f'{name}, Вы вошли, запишитесь на консультацию.\n', reply_markup=kb_order)
             except:
                 await message.answer(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
     else:
@@ -188,7 +189,7 @@ async def load_description(message: types.Message, state: FSMContext):
 async def order_client(message: types.Message):
     """ Запись на консультацию  """
     await FSMDate.date_order.set()
-    await message.answer("Введите дату")
+    await message.answer("Введите дату", reply_markup=types.ReplyKeyboardRemove())
 
 
 @dp.message_handler(state=FSMDate.date_order)  # Вводим дату записи консультации
@@ -220,8 +221,9 @@ async def get_date_order(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(text='Выбрать время для консультации')
-async def new_search(message: types.Message):
-    await message.answer(f'\nОтлично, {client_session[1]}, давайте выберем свободное время ...', reply_markup=time_keyb)
+async def time_consult(message: types.Message):
+    await message.answer(f'\nОтлично, {client_session[1]}, '
+                         f'давайте выберем свободное время ...', reply_markup=time_keyb)
     await message.delete()
 
 
@@ -232,6 +234,9 @@ async def callbacks_time(callback: types.CallbackQuery):
     base_connect, cur = base_init()
     add_client_order(data_order_session, action_time, client_session[0])
     base_close(base_connect)
+    await callback.answer(f'Супер, {client_session[1]}, вы записались на {data_order_session}'
+                         f' начало сеанса: {action_time}')
+    # await message.answer('Поздравляю!', reply_markup=kb_order)
 
 
 """ ********** Улавливаем текст с кнопки **************"""

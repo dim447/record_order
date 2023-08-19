@@ -1,4 +1,5 @@
 import sqlite3 as sq
+
 # from create_bot import bot, dp
 
 name_clients = []
@@ -80,7 +81,19 @@ def sql_read_client():
     return name_clients
 
 
-async def sql_delete_client(name):
+def get_record_client():
+    '''
+    Чтение данных о всех записях клиента в базе.
+    '''
+    ret = cur.execute("SELECT date, CASE WHEN time10 = '3' "
+                      "THEN time10 ELSE NULL END AS time10, CASE WHEN time11 = '3' "
+                      "THEN time10 ELSE NULL END AS time11, CASE WHEN time13 = '3' "
+                      "THEN time10 ELSE NULL END AS time13, CASE WHEN time14 = '3' "
+                      "THEN time10 ELSE NULL END AS time14 FROM sсhedule GROUP BY date;")
+    print(ret)
+
+
+def sql_delete_client(name):
     '''
     Удаление клиента.
     :param name: имя клиента, надо подумать, имена могут быть разные
@@ -130,20 +143,6 @@ def sql_read_free_time(date):
         return column_names, ret[1:]
     else:
         return None, None
-
-# def sql_read_free_time(date):
-#     '''
-#     Проверяет по дате есть ли записи на эту дату.
-#     Выводит в виде таблицы часы записи и имена клиентов
-#     '''
-#     record_exists = check_record_exists(date)
-#     if record_exists:
-#         ret = cur.execute('SELECT * FROM sсhedule WHERE date = ?', (date,)).fetchone()
-#         column_names = [i[0] for i in cur.description]
-#         print(f'Часы', *column_names[1:], sep="  ")
-#         print(f'   ', *ret[1:], sep="    ")
-#     else:
-#         print(f"Запись на дату {date} не найдена.")
 
 
 def check_date_exists(key_value):
