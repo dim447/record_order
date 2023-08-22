@@ -81,16 +81,23 @@ def sql_read_client():
     return name_clients
 
 
-def get_record_client():
+def get_record_client(client_id):  # Как подставить клиент_айди в запрос?
     '''
     Чтение данных о всех записях клиента в базе.
     '''
-    ret = cur.execute("SELECT date, CASE WHEN time10 = '3' "
-                      "THEN time10 ELSE NULL END AS time10, CASE WHEN time11 = '3' "
-                      "THEN time10 ELSE NULL END AS time11, CASE WHEN time13 = '3' "
-                      "THEN time10 ELSE NULL END AS time13, CASE WHEN time14 = '3' "
-                      "THEN time10 ELSE NULL END AS time14 FROM sсhedule GROUP BY date;")
-    print(ret)
+    ret = cur.execute("SELECT date, "
+                      "CASE WHEN time10 = ? THEN time10 ELSE NULL END AS time10, "
+                      "CASE WHEN time11 = ? THEN time11 ELSE NULL END AS time11, "
+                      "CASE WHEN time13 = ? THEN time10 ELSE NULL END AS time13, "
+                      "CASE WHEN time14 = ? THEN time10 ELSE NULL END AS time14, "
+                      "CASE WHEN time15 = ? THEN time10 ELSE NULL END AS time15 "
+                      "FROM sсhedule GROUP BY date;",
+                      (client_id, client_id, client_id, client_id, client_id))
+    print(client_id, ret)
+    # for _ in ret:
+    #     if client_id in _:
+    #         print(_)
+    return ret
 
 
 def sql_delete_client(name):

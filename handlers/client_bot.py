@@ -3,10 +3,11 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher.filters import Text
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from create_bot import bot, dp
 from data_base.sqlite_db import base_init, check_phone_number, base_close, sql_add_client, sql_read_free_time, \
-    add_client_order
+    add_client_order, get_record_client
 from keyboards.client_kb import kb_client, kb_order, kb_order_time, time_keyb
 import re
 
@@ -59,8 +60,11 @@ async def help_command(message: types.Message):
     await message.delete()
 
 
-@dp.message_handler(text='В начало')
-async def help_command(message: types.Message):
+@dp.message_handler(text='Отмена', state="*")
+async def cancel_command(message: types.Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state:
+        await state.finish()
     await message.answer(f'В начало {message.from_user.id}, {HELP}', reply_markup=kb_client)
     await message.delete()
 
@@ -182,6 +186,22 @@ async def load_description(message: types.Message, state: FSMContext):
 
 
 # ********** Конец Блока регистрации клиента **************
+#
+@dp.message_handler(text='Мои записи')
+async def view_order_client(message: types.Message):
+    """ Запись на консультацию  """
+    try:
+        base_connect, cur = base_init()
+        my_order = get_record_client(client_session[0])
+
+        for _ in my_order:
+            if client_session[0] in _:
+                print(_)
+                await message.answer(_)
+        base_close(base_connect)
+    except:
+        return "Ошибка ввода данных"
+    await message.answer("Введите дату", reply_markup=types.ReplyKeyboardRemove())
 
 
 # ********** Запись на консультацию - запрос даты **************
@@ -195,6 +215,8 @@ async def order_client(message: types.Message):
 @dp.message_handler(state=FSMDate.date_order)  # Вводим дату записи консультации
 async def get_date_order(message: types.Message, state: FSMContext):
     global data_order_session
+    list_buttons = []
+    global markup
     try:
         datetime.date.fromisoformat(message.text)
         async with state.proxy() as data:
@@ -210,21 +232,51 @@ async def get_date_order(message: types.Message, state: FSMContext):
                 if records[_]:
                     await message.answer(f'Время {column_names_str[_]} -- > Занято')
                 else:
+                    list_buttons.append(column_names_str[_])
                     await message.answer(f'Время {column_names_str[_]} -- > Свободно')
+                    print(list_buttons)
+                    markup = InlineKeyboardMarkup(row_width=2)
+                    for text in list_buttons:
+                        markup.insert(InlineKeyboardButton(f"{text}", callback_data=f"time_{text}"))
+
         except:
             return "Ошибка при работе с базой"
-        await message.reply(f"Выберите время для записи", reply_markup=kb_order_time)
+        await message.reply(f"Выберите время для записи", reply_markup=markup)
     except ValueError:
         await message.reply(f'Вы ввели не правильную дату, попробуйте еще раз! \n')
     await message.delete()
     # return data_order
 
 
+
+# def gen_markup(texts: list, prefix: str, row_width: int) -> InlineKeyboardMarkup:
+#     markup = InlineKeyboardMarkup(row_width=2)
+#     for text in enumerate(list_buttons):
+#         markup.insert(InlineKeyboardButton(f"{text}", callback_data=f"time_{text}"))
+#     return markup
+
+
+# def gen(list_buttons, n):
+#     count = 0
+#     for i in range(0, len(list_buttons), n):
+#         count += 1
+#         yield [{'text': i, 'callback_data': num + n * (count - 1)} \
+#                for num, i in enumerate(lst[i:i + n])]
+#
+#
+# keyboard = {
+#     'inline_keyboard': list(gen(a, 3))  # тут задаем кол-во столбцов
+# }
+
+
 @dp.message_handler(text='Выбрать время для консультации')
 async def time_consult(message: types.Message):
     await message.answer(f'\nОтлично, {client_session[1]}, '
-                         f'давайте выберем свободное время ...', reply_markup=time_keyb)
+                         f'давайте выберем свободное время ...', reply_markup=markup)
     await message.delete()
+
+
+
 
 
 @dp.callback_query_handler(Text(startswith="time"))
