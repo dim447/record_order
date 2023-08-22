@@ -114,7 +114,7 @@ async def load_phone(message: types.Message, state: FSMContext):
                 await message.answer(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
     else:
         await message.reply(
-            f"Номер телефона невереного формата.\nПовторите ввод фамилии и номер телефона в формате +7**********")
+            f"Номер телефона неверного формата.\nПовторите ввод фамилии и номер телефона в формате +7**********")
     # return client_session
 
 
@@ -173,6 +173,7 @@ async def load_description(message: types.Message, state: FSMContext):
         data['e_mail'] = message.text
     # await sqlite_db.sql_add_command(state)
     client = (data['name'], data['surname'], data['age'], data['phone_number'], data['e_mail'])
+    # client_session = (id_client, data['name'], data['phone_number']) # Тут надо вытащить клиент_айди
     # print(client)
     try:
         base_connect, cur = base_init()
@@ -234,7 +235,7 @@ async def get_date_order(message: types.Message, state: FSMContext):
                 else:
                     list_buttons.append(column_names_str[_])
                     await message.answer(f'Время {column_names_str[_]} -- > Свободно')
-                    print(list_buttons)
+                    # print(list_buttons)
                     markup = InlineKeyboardMarkup(row_width=2)
                     for text in list_buttons:
                         markup.insert(InlineKeyboardButton(f"{text}", callback_data=f"time_{text}"))
@@ -248,35 +249,11 @@ async def get_date_order(message: types.Message, state: FSMContext):
     # return data_order
 
 
-
-# def gen_markup(texts: list, prefix: str, row_width: int) -> InlineKeyboardMarkup:
-#     markup = InlineKeyboardMarkup(row_width=2)
-#     for text in enumerate(list_buttons):
-#         markup.insert(InlineKeyboardButton(f"{text}", callback_data=f"time_{text}"))
-#     return markup
-
-
-# def gen(list_buttons, n):
-#     count = 0
-#     for i in range(0, len(list_buttons), n):
-#         count += 1
-#         yield [{'text': i, 'callback_data': num + n * (count - 1)} \
-#                for num, i in enumerate(lst[i:i + n])]
-#
-#
-# keyboard = {
-#     'inline_keyboard': list(gen(a, 3))  # тут задаем кол-во столбцов
-# }
-
-
 @dp.message_handler(text='Выбрать время для консультации')
 async def time_consult(message: types.Message):
     await message.answer(f'\nОтлично, {client_session[1]}, '
                          f'давайте выберем свободное время ...', reply_markup=markup)
     await message.delete()
-
-
-
 
 
 @dp.callback_query_handler(Text(startswith="time"))
