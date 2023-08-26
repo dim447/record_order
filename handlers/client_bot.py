@@ -8,7 +8,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from create_bot import bot, dp
 from data_base.sqlite_db import base_init, check_phone_number, base_close, sql_add_client, sql_read_free_time, \
     add_client_order, get_record_client
-from keyboards.client_kb import kb_client, kb_order, kb_order_time, time_keyb
+from keyboards.client_kb import kb_client, kb_order, kb_order_time, kb_order1, kb_cancel
 import re
 
 
@@ -31,6 +31,7 @@ class FSMDate(StatesGroup):
 
 client_session = ()
 data_order_session = None
+column_names_str = ('10-11', '11-12', '13-14', '14-15', '15-16')
 
 HI = '''
 (f"Добрый день, _{message.from_user.username}_! "
@@ -46,11 +47,11 @@ HELP = ''' Итак, вот что умеет бот:\n-------------------------
 '''
 
 
-@dp.message_handler(commands=['start'])
+@dp.message_handler(commands=['start', 'help'])
 async def start_command(message: types.Message):
-    await message.answer(f"Добрый день, _{message.from_user.username}_! \nНачнём: --->\n"
-                         f"Чтобы узнать, как записаться на консультацию,\nжмите /help для информации",
-                         parse_mode="Markdown", reply_markup=types.ReplyKeyboardRemove())
+    await message.answer(f"Добрый день, _{message.from_user.username}_! \nНачнём: --->\n", parse_mode="Markdown")
+                        #,parse_mode="Markdown", reply_markup=types.ReplyKeyboardRemove())
+    await bot.send_message(message.from_user.id, HELP, reply_markup=kb_client)
     await message.delete()
 
 
@@ -60,7 +61,7 @@ async def help_command(message: types.Message):
     await message.delete()
 
 
-@dp.message_handler(text='Отмена', state="*")
+@dp.message_handler(text='Выход', state="*")
 async def cancel_command(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state:
@@ -111,7 +112,7 @@ async def load_phone(message: types.Message, state: FSMContext):
                 await state.finish()
                 await message.answer(f'{name}, Вы вошли, запишитесь на консультацию.\n', reply_markup=kb_order)
             except:
-                await message.answer(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.")
+                await message.answer(f"Вы не зарегистрированы в базе данных. Пройдите регистрацию.", reply_markup=kb_client)
     else:
         await message.reply(
             f"Номер телефона неверного формата.\nПовторите ввод фамилии и номер телефона в формате +7**********")
@@ -194,15 +195,17 @@ async def view_order_client(message: types.Message):
     try:
         base_connect, cur = base_init()
         my_order = get_record_client(client_session[0])
-
-        for _ in my_order:
-            if client_session[0] in _:
-                print(_)
-                await message.answer(_)
+        date_today = str(datetime.datetime.now()).split(' ')[0]
+        for date_time in my_order:
+            if client_session[0] in date_time and date_time[0] >= date_today:
+                print(date_time)
+                for i in range(1, len(date_time)):
+                    if date_time[i] == client_session[0]:
+                        await message.answer(f' Дата: {date_time[0]}, время: {column_names_str[i-1]}')
         base_close(base_connect)
     except:
         return "Ошибка ввода данных"
-    await message.answer("Введите дату", reply_markup=types.ReplyKeyboardRemove())
+    await message.answer("Запишитесь на консультацию", reply_markup=kb_order1)
 
 
 # ********** Запись на консультацию - запрос даты **************
@@ -210,7 +213,7 @@ async def view_order_client(message: types.Message):
 async def order_client(message: types.Message):
     """ Запись на консультацию  """
     await FSMDate.date_order.set()
-    await message.answer("Введите дату", reply_markup=types.ReplyKeyboardRemove())
+    await message.answer("Введите дату в формате: '2023-mm-dd", reply_markup=types.ReplyKeyboardRemove())
 
 
 @dp.message_handler(state=FSMDate.date_order)  # Вводим дату записи консультации
@@ -228,14 +231,12 @@ async def get_date_order(message: types.Message, state: FSMContext):
             base_connect, cur = base_init()
             column_names, records = sql_read_free_time(data_order_session)
             base_close(base_connect)
-            column_names_str = ('10-11', '11-12', '13-14', '14-15', '15-16')
             for _ in range(len(column_names[1:]) + 1):
                 if records[_]:
                     await message.answer(f'Время {column_names_str[_]} -- > Занято')
                 else:
                     list_buttons.append(column_names_str[_])
                     await message.answer(f'Время {column_names_str[_]} -- > Свободно')
-                    # print(list_buttons)
                     markup = InlineKeyboardMarkup(row_width=2)
                     for text in list_buttons:
                         markup.insert(InlineKeyboardButton(f"{text}", callback_data=f"time_{text}"))
@@ -244,7 +245,7 @@ async def get_date_order(message: types.Message, state: FSMContext):
             return "Ошибка при работе с базой"
         await message.reply(f"Выберите время для записи", reply_markup=markup)
     except ValueError:
-        await message.reply(f'Вы ввели не правильную дату, попробуйте еще раз! \n')
+        await message.reply(f'Вы ввели не правильную дату, попробуйте еще раз! \n', reply_markup=kb_cancel)
     await message.delete()
     # return data_order
 
@@ -259,7 +260,6 @@ async def time_consult(message: types.Message):
 @dp.callback_query_handler(Text(startswith="time"))
 async def callbacks_time(callback: types.CallbackQuery):
     action_time = callback.data.split("_")[1]
-    print(action_time)
     base_connect, cur = base_init()
     add_client_order(data_order_session, action_time, client_session[0])
     base_close(base_connect)

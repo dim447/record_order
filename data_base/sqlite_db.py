@@ -81,22 +81,19 @@ def sql_read_client():
     return name_clients
 
 
-def get_record_client(client_id):  # Как подставить клиент_айди в запрос?
+def get_record_client(client_id):
     '''
     Чтение данных о всех записях клиента в базе.
     '''
     ret = cur.execute("SELECT date, "
                       "CASE WHEN time10 = ? THEN time10 ELSE NULL END AS time10, "
                       "CASE WHEN time11 = ? THEN time11 ELSE NULL END AS time11, "
-                      "CASE WHEN time13 = ? THEN time10 ELSE NULL END AS time13, "
-                      "CASE WHEN time14 = ? THEN time10 ELSE NULL END AS time14, "
-                      "CASE WHEN time15 = ? THEN time10 ELSE NULL END AS time15 "
+                      "CASE WHEN time13 = ? THEN time13 ELSE NULL END AS time13, "
+                      "CASE WHEN time14 = ? THEN time14 ELSE NULL END AS time14, "
+                      "CASE WHEN time15 = ? THEN time15 ELSE NULL END AS time15 "
                       "FROM sсhedule GROUP BY date;",
                       (client_id, client_id, client_id, client_id, client_id))
     print(client_id, ret)
-    # for _ in ret:
-    #     if client_id in _:
-    #         print(_)
     return ret
 
 
@@ -108,6 +105,17 @@ def sql_delete_client(name):
     '''
     cur.execute('DELETE FROM clients WHERE name == ?', (name,))
     base_connect.commit()
+
+
+def add_date(date):
+    '''
+    Добавление даты, если такой даты не было
+    :param date:  новая дата
+    :return:
+    '''
+    cur.execute('INSERT INTO sсhedule (date) VALUES (?)', (date,))
+    base_connect.commit()
+    base_connect.close()
 
 
 def add_client_order(date, time, name):
@@ -149,7 +157,10 @@ def sql_read_free_time(date):
         column_names = [i[0] for i in cur.description]
         return column_names, ret[1:]
     else:
-        return None, None
+        add_date(date)
+        ret = cur.execute('SELECT * FROM sсhedule WHERE date = ?', (date,)).fetchone()
+        column_names = [i[0] for i in cur.description]
+        return column_names, ret[1:]
 
 
 def check_date_exists(key_value):
