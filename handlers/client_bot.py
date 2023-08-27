@@ -164,7 +164,7 @@ async def load_name(message: types.Message, state: FSMContext):
         await message.reply("Введите электронную почту'")
     else:
         await message.reply(
-            f"Номер телефона невереного формата.\nПовторите ввод фамилии и номер телефона в формате +7**********")
+            f"Номер телефона неверного формата.\nПовторите ввод номера телефона в формате +7**********")
 
 
 # Ловим пятый ответ
@@ -172,10 +172,7 @@ async def load_name(message: types.Message, state: FSMContext):
 async def load_description(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['e_mail'] = message.text
-    # await sqlite_db.sql_add_command(state)
     client = (data['name'], data['surname'], data['age'], data['phone_number'], data['e_mail'])
-    # client_session = (id_client, data['name'], data['phone_number']) # Тут надо вытащить клиент_айди
-    # print(client)
     try:
         base_connect, cur = base_init()
         sql_add_client(client)
