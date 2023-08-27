@@ -115,7 +115,7 @@ def add_date(date):
     '''
     cur.execute('INSERT INTO sсhedule (date) VALUES (?)', (date,))
     base_connect.commit()
-    base_connect.close()
+    # base_connect.close()
 
 
 def add_client_order(date, time, name):
@@ -130,7 +130,7 @@ def add_client_order(date, time, name):
     if record_exists:
         pass
     else:
-        cur.execute('INSERT INTO sсhedule (date) VALUES (?)', [date])
+        add_date(date) # cur.execute('INSERT INTO sсhedule (date) VALUES (?)', [date])
     match time:
         case '10-11':
             cur.execute('UPDATE sсhedule SET "time10" = ? WHERE date = ?', (name, date))

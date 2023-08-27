@@ -29,7 +29,7 @@ class FSMDate(StatesGroup):
     date_order = State()
 
 
-client_session = ()
+# client_session = ()
 data_order_session = None
 column_names_str = ('10-11', '11-12', '13-14', '14-15', '15-16')
 
@@ -79,6 +79,17 @@ def validate_phone_number(phone_number):
         return False
 
 
+def is_valid_email(email):
+    # Паттерн для проверки корректности email
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+
+    # Используем регулярное выражение для проверки
+    if re.match(pattern, email):
+        return True
+    else:
+        return False
+
+
 # Блок входа клиента
 # Ловим фамилию и телефон для проверки клиента в базе
 @dp.message_handler(text='Вход', state="*")
@@ -107,7 +118,6 @@ async def load_phone(message: types.Message, state: FSMContext):
                 base_connect, cur = base_init()
                 name, id_client = check_phone_number(data['phone_number'])
                 client_session = (id_client, name, data['phone_number'])
-                # print(client_session)
                 base_close(base_connect)
                 await state.finish()
                 await message.answer(f'{name}, Вы вошли, запишитесь на консультацию.\n', reply_markup=kb_order)
@@ -124,7 +134,7 @@ async def load_phone(message: types.Message, state: FSMContext):
 async def reg_client(message: types.Message):
     """ Регистрация клиента  """
     await FSMReg.name.set()
-    await message.answer("Введите имя")
+    await message.answer("Введите имя", reply_markup=types.ReplyKeyboardRemove())
 
 
 # Ловим первый ответ
@@ -148,10 +158,13 @@ async def load_name(message: types.Message, state: FSMContext):
 # Ловим третий ответ
 @dp.message_handler(state=FSMReg.age)
 async def load_name(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['age'] = message.text
-    await FSMReg.next()
-    await message.reply("Введите номер телефона")
+    if message.text.isdigit():
+        async with state.proxy() as data:
+            data['age'] = message.text
+        await FSMReg.next()
+        await message.reply("Введите номер телефона в формате +7**********")
+    else:
+        await message.answer("Возраст должен содержать только цифры")
 
 
 # Ловим четвертый ответ
@@ -170,18 +183,25 @@ async def load_name(message: types.Message, state: FSMContext):
 # Ловим пятый ответ
 @dp.message_handler(state=FSMReg.e_mail)
 async def load_description(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['e_mail'] = message.text
-    client = (data['name'], data['surname'], data['age'], data['phone_number'], data['e_mail'])
-    try:
-        base_connect, cur = base_init()
-        sql_add_client(client)
-        base_close(base_connect)
-    except:
-        return "Ошибка ввода данных"
-    await state.finish()
-    await message.answer(f'{data["name"]}, Вы успешно зарегистрировались, '
-                         f'запишитесь на консультацию.', reply_markup=kb_order)
+    global client_session
+    if is_valid_email(message.text):
+        async with state.proxy() as data:
+            data['e_mail'] = message.text
+        client = (data['name'], data['surname'], data['age'], data['phone_number'], data['e_mail'])
+        try:
+            base_connect, cur = base_init()
+            sql_add_client(client)
+            name, id_client = check_phone_number(data['phone_number'])
+            base_close(base_connect)
+            client_session = (id_client, name, data['phone_number'])
+            # print(client_session)
+        except:
+            return "Ошибка ввода данных"
+        await state.finish()
+        await message.answer(f'{client_session[1]}, Вы успешно зарегистрировались, '
+                             f'запишитесь на консультацию.', reply_markup=kb_order)
+    else:
+        await message.reply("Email некорректен.\nПовторите ввод электронной почты в формате my_email@mail.com")
 
 
 # ********** Конец Блока регистрации клиента **************
@@ -220,7 +240,7 @@ async def get_date_order(message: types.Message, state: FSMContext):
     global markup
     try:
         datetime.date.fromisoformat(message.text)
-        async with state.proxy() as data:
+        async with state.proxy() as data_order_session:
             data_order_session = message.text
         await state.finish()
         await message.answer(f"Посмотрите свободные часы на {data_order_session}", reply_markup=kb_order_time)
@@ -249,6 +269,7 @@ async def get_date_order(message: types.Message, state: FSMContext):
 
 @dp.message_handler(text='Выбрать время для консультации')
 async def time_consult(message: types.Message):
+    # print(client_session)
     await message.answer(f'\nОтлично, {client_session[1]}, '
                          f'давайте выберем свободное время ...', reply_markup=markup)
     await message.delete()
