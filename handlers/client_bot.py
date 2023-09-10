@@ -49,7 +49,7 @@ HELP = ''' Итак, вот что умеет бот:\n-------------------------
 
 @dp.message_handler(commands=['start', 'help'])
 async def start_command(message: types.Message):
-    await message.answer(f"Добрый день, _{message.from_user.username}_! \nНачнём: --->\n", parse_mode="Markdown")
+    await message.answer(f"Добрый день, {message.from_user.username}! \nНачнём: --->\n") #, parse_mode="Markdown")
                         #,parse_mode="Markdown", reply_markup=types.ReplyKeyboardRemove())
     await bot.send_message(message.from_user.id, HELP, reply_markup=kb_client)
     await message.delete()

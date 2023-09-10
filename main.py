@@ -9,7 +9,7 @@ app.config['SECRET_KEY'] = 'sdjlkwkwjer435kjhj234gv2349fdjh38'
 
 
 class Clients(db.Model):
-    """ Класс Клиент получает из базы данных информацию о клиенте   """
+    """ Класс Clients получает из базы данных информацию о клиенте   """
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
@@ -28,7 +28,7 @@ class Clients(db.Model):
 
 
 class Sсhedule(db.Model):
-    """ Класс Расписание получает из базы данных информацию о свободном времени   """
+    """ Класс Sсhedule получает из базы данных информацию о свободном времени   """
 
     date = db.Column(db.String(10), primary_key=True)
     time10 = db.Column(db.String(80), nullable=False)
@@ -218,17 +218,18 @@ def book(date):
     """ Расписание на дату   """
     client_list_name, client_list_surname = [], []
     schedule = db.session.get(Sсhedule, date)
-    # print(schedule)
+    print(schedule)
     id_list = [schedule.time10, schedule.time11, schedule.time13, schedule.time14, schedule.time15]
-    # print(id_list)
+    print(id_list)
     for i in id_list:
-        if i != '':
+        if i:
+            print(db.session.get(Clients, i).name)
             client_list_name.append(db.session.get(Clients, i).name)
         else:
             client_list_name.append("Null")
-    # print(client_list_name)
+    print(client_list_name)
     for i in id_list:
-        if i != '':
+        if i:
             client_list_surname.append(db.session.get(Clients, i).surname)
         else:
             client_list_surname.append("Null")
