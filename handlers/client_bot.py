@@ -287,15 +287,3 @@ async def callbacks_time(callback: types.CallbackQuery):
 
 
 """ ********** Улавливаем текст с кнопки **************"""
-
-# @dp.message_handler(content_types=['text'])
-# async def echo_send(message: types.Message):
-#     if message.text == "Привет" or message.text == 'привет' or message.text == 'hi' or message.text == 'Hi' or message.text == 'HI':
-#         await message.answer(f"Здарова, _{message.from_user.username}_! "
-#                              f"Какие люди! \nВот не ожидал тебя тут увидеть, бро \U0001F91D \nНачнём: жми  /help",
-#                              parse_mode="Markdown")
-#     else:
-#         await message.answer(f"УПС \U0001F914, _{message.from_user.username}_! "
-#                              f"Такой команды нет, бро \U0001F91D \nНачнём: жми  /help",
-#                              parse_mode="Markdown", reply_markup=kb_client)
-#         await message.delete()
